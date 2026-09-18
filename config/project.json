@@ -1,0 +1,58 @@
+{
+  "project": {
+    "name": "Job Africa",
+    "slug": "job-africa",
+    "description": "Agrégateur intelligent d'offres d'emploi en Afrique de l'Ouest",
+    "version": "1.0.0",
+    "author": "Ton nom",
+    "email": "contact@jobafrica.app"
+  },
+
+  "paths": {
+    "backend": "backend",
+    "frontend": "frontend",
+    "supabase": "supabase",
+    "github": ".github/workflows",
+    "scripts": "backend/scripts",
+    "tests": "backend/tests"
+  },
+
+  "urls": {
+    "frontend": "https://job-africa.vercel.app",
+    "backend": "https://job-africa-api.onrender.com",
+    "supabase": "https://xxxxx.supabase.co"
+  },
+
+  "features": {
+    "ai": true,
+    "i18n": true,
+    "monetization": true,
+    "push": true,
+    "pwa": true,
+    "social_share": true,
+    "admin": true
+  },
+
+  "languages": ["fr", "en"],
+
+  "ai_models": {
+    "summarizer": "Labagaite/gemma-Summarizer-2b-it-LORA-bnb-4bit",
+    "ner": "VAGOsolutions/SauerkrautLM-LFM2.5-GLiNER",
+    "language_id": "UBC-NLP/afroscope-model",
+    "embeddings": "ibm-granite/granite-embedding-97m-multilingual-r2"
+  },
+
+  "payment": {
+    "provider": "kkiapay",
+    "currency": "XOF",
+    "premium_job_price": 2000,
+    "premium_subscription_price": 5000,
+    "sponsored_job_price": 25000,
+    "banner_price": 50000
+  },
+
+  "email": {
+    "provider": "resend",
+    "from": "Job Africa <noreply@jobafrica.app>"
+  }
+}
