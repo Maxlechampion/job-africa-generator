@@ -1,0 +1,7 @@
+# ==================== IA (Hugging Face) ====================
+transformers==4.46.3
+sentence-transformers==3.2.1
+torch==2.5.1
+accelerate==1.1.1
+gliner==0.2.13
+pydantic[email]==2.9.2

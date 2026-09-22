@@ -1,20 +1,15 @@
 # Job Africa — Frontend
 
-Interface web Vue.js 3 de l'agrégateur Job Africa.
+Interface Vue 3 de consultation des offres d'emploi.
 
-## Stack technique
+## Stack
 
 - Vue 3 (Composition API)
-- Vite (build ultra-rapide)
-- Pinia (state management)
-- Vue Router (navigation)
-- TailwindCSS (styling)
-- Axios (HTTP)
-
-## Prérequis
-
-- Node.js 20 ou supérieur
-- npm 10 ou supérieur
+- Vite
+- Vue Router
+- Pinia
+- TailwindCSS
+- Axios
 
 ## Installation
 
@@ -33,26 +28,11 @@ npm run build
 npm run preview
 ```
 
-## Variables d'environnement
+## Fonctionnalites
 
-Créer un fichier `.env` :
-
-```env
-VITE_API_URL=http://127.0.0.1:8000
-VITE_SUPABASE_URL=https://xxxxx.supabase.co
-VITE_SUPABASE_ANON_KEY=eyJhbGciOi...
-```
-
-## Structure
-
-```
-src/
-├── main.js              Point d'entrée
-├── App.vue              Composant racine
-├── router/              Configuration des routes
-├── stores/              Stores Pinia
-├── services/            Appels API
-├── i18n/                Traductions FR/EN
-├── components/          Composants réutilisables
-└── views/               Pages
-```
+- Accueil avec recherche rapide + dernieres offres
+- Liste paginee avec filtres (pays, categorie, contrat, teletravail)
+- Recherche par mot-cle
+- Detail d'une offre avec resume IA
+- Page statistiques
+- Design responsive

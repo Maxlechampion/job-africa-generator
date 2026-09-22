@@ -2,7 +2,7 @@
 Normalisation des données d'offres d'emploi.
 
 Fonctions :
-    - clean_text : nettoie un texte (HTML, espaces)
+    - clean_text : nettoie un texte (HTML, entités, espaces)
     - detect_pays : détecte le pays depuis le texte
     - normalize_url : nettoie une URL (retire tracking)
     - parse_date : convertit une date en ISO 8601
@@ -10,6 +10,7 @@ Fonctions :
     - job_fingerprint : empreinte pour la déduplication
 """
 
+import html
 import re
 from datetime import datetime
 from typing import Optional
@@ -36,12 +37,38 @@ PAYS_AFRIQUE_OUEST = {
     "guinée": "Guinée",
     "ghana": "Ghana",
     "nigeria": "Nigeria",
+    "kenya": "Kenya",
+    "uganda": "Uganda",
+    "tanzania": "Tanzanie",
+    "rwanda": "Rwanda",
+    "south africa": "Afrique du Sud",
+    "afrique du sud": "Afrique du Sud",
+    "egypt": "Égypte",
+    "egypte": "Égypte",
 }
 
 
+# ==================== Mots d'article (à filtrer) ====================
+MOTS_ARTICLE = [
+    "mis à jour le",
+    "dans cet article",
+    "nous faisons le point",
+    "guide complet",
+    "cliquez ici pour",
+    "lire la suite",
+    "abonnez-vous",
+    "cet article a été",
+    "publié le",
+    "source :",
+    "crédit photo",
+]
+
+
+# ==================== Nettoyage de texte ====================
 def clean_text(value: Optional[str]) -> Optional[str]:
     """
     Nettoie un texte :
+    - décode les entités HTML (&#8217; → ', &nbsp; → ' ')
     - supprime les balises HTML
     - supprime les caractères de contrôle
     - normalise les espaces
@@ -56,18 +83,28 @@ def clean_text(value: Optional[str]) -> Optional[str]:
     if not value:
         return None
 
-    # Supprime les balises HTML
+    # 1. Décode les entités HTML (&#8217; → ', &amp; → &, etc.)
+    value = html.unescape(value)
+
+    # 2. Supprime les balises HTML
     value = re.sub(r"<[^>]+>", " ", value)
 
-    # Supprime les caractères de contrôle
+    # 3. Supprime les entités HTML résiduelles non décodées
+    #    (au cas où html.unescape n'a pas tout traité)
+    value = re.sub(r"&#\d+;", "'", value)
+    value = re.sub(r"&#x[0-9a-fA-F]+;", "'", value)
+    value = re.sub(r"&[a-zA-Z]+;", " ", value)
+
+    # 4. Supprime les caractères de contrôle
     value = re.sub(r"[\x00-\x1f\x7f]", " ", value)
 
-    # Normalise les espaces multiples
-    value = " ".join(value.split())
+    # 5. Normalise les espaces (y compris \xa0 = nbsp)
+    value = re.sub(r"\s+", " ", value)
 
     return value.strip() or None
 
 
+# ==================== Détection du pays ====================
 def detect_pays(text: Optional[str]) -> Optional[str]:
     """
     Détecte le pays à partir d'un texte.
@@ -91,6 +128,7 @@ def detect_pays(text: Optional[str]) -> Optional[str]:
     return None
 
 
+# ==================== Normalisation d'URL ====================
 def normalize_url(url: Optional[str]) -> Optional[str]:
     """
     Nettoie une URL :
@@ -131,6 +169,7 @@ def normalize_url(url: Optional[str]) -> Optional[str]:
         return url
 
 
+# ==================== Parsing de date ====================
 def parse_date(value) -> Optional[str]:
     """
     Convertit une date en ISO 8601.
@@ -177,6 +216,52 @@ def parse_date(value) -> Optional[str]:
     return None
 
 
+# ==================== Filtre de contenu ====================
+def _is_article_blog(description: str) -> bool:
+    """
+    Détecte si une description ressemble à un article de blog
+    plutôt qu'à une offre d'emploi.
+    """
+
+    if not description:
+        return False
+
+    # Vérifie les 500 premiers caractères
+    desc_lower = description[:500].lower()
+
+    for mot in MOTS_ARTICLE:
+        if mot in desc_lower:
+            return True
+
+    return False
+
+
+def _truncate_description(description: str, max_length: int = 5000) -> str:
+    """
+    Tronque une description trop longue.
+
+    Args:
+        description : Description à tronquer
+        max_length  : Longueur maximum
+
+    Returns:
+        Description tronquée avec "..."
+    """
+
+    if not description or len(description) <= max_length:
+        return description
+
+    # Essaie de couper à la fin d'une phrase
+    truncated = description[:max_length]
+    last_period = truncated.rfind(".")
+
+    if last_period > max_length * 0.7:
+        return truncated[:last_period + 1] + " [...]"
+
+    return truncated + " [...]"
+
+
+# ==================== Normalisation d'offre ====================
 def normalize_job(job: dict) -> dict:
     """
     Normalise une offre d'emploi.
@@ -191,10 +276,28 @@ def normalize_job(job: dict) -> dict:
     titre = clean_text(job.get("titre")) or "Offre sans titre"
     description = clean_text(job.get("description"))
 
+    # ⚠️ FILTRE 1 : Rejette les descriptions trop longues (articles de blog)
+    if description and len(description) > 10000:
+        description = _truncate_description(description, 5000)
+
+    # ⚠️ FILTRE 2 : Tronque les descriptions qui ressemblent à un article
+    if description and _is_article_blog(description):
+        description = _truncate_description(description, 500)
+
     # Détecte le pays si non fourni
     pays = clean_text(job.get("pays"))
     if not pays:
         pays = detect_pays(f"{titre} {description or ''}")
+
+    # Normalise le type de contrat
+    type_contrat = clean_text(job.get("type_contrat"))
+    if type_contrat:
+        type_contrat = type_contrat.strip().title()
+
+    # Normalise le niveau
+    niveau = clean_text(job.get("niveau"))
+    if niveau:
+        niveau = niveau.strip().title()
 
     return {
         "titre": titre[:300],
@@ -202,8 +305,8 @@ def normalize_job(job: dict) -> dict:
         "pays": pays,
         "ville": clean_text(job.get("ville")),
         "description": description,
-        "type_contrat": clean_text(job.get("type_contrat")),
-        "niveau": clean_text(job.get("niveau")),
+        "type_contrat": type_contrat,
+        "niveau": niveau,
         "categorie": clean_text(job.get("categorie")),
         "date_publication": parse_date(job.get("date_publication")),
         "date_expiration": parse_date(job.get("date_expiration")),
@@ -213,6 +316,7 @@ def normalize_job(job: dict) -> dict:
     }
 
 
+# ==================== Empreinte de déduplication ====================
 def job_fingerprint(job: dict) -> str:
     """
     Génère une empreinte pour la déduplication.

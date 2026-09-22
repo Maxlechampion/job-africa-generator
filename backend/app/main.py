@@ -7,10 +7,11 @@ FastAPI avec CORS, healthcheck et routers.
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.core.middleware import LanguageMiddleware
 from app.core.config import settings
 from app.core.logger import get_logger
 from app.services.scheduler import start_scheduler, stop_scheduler
-from app.api import jobs, stats, collect, admin, collect_ats, collect_scrapers, collect_api
+from app.api import jobs, stats, collect, admin, collect_ats, collect_scrapers, collect_api, admin_dedup, companies, skills, favorites, alerts, admin_sources, ai, dashboard, auth
 
 
 logger = get_logger(__name__)
@@ -48,6 +49,15 @@ app.include_router(admin.router)
 app.include_router(collect_ats.router)
 app.include_router(collect_scrapers.router)
 app.include_router(collect_api.router)
+app.include_router(admin_dedup.router)
+app.include_router(companies.router)
+app.include_router(skills.router)
+app.include_router(favorites.router)
+app.include_router(alerts.router)
+app.include_router(admin_sources.router)
+app.include_router(ai.router)
+app.include_router(dashboard.router)
+app.include_router(auth.router)
 
 
 # ==================== Root ====================

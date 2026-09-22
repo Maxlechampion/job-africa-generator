@@ -1,0 +1,62 @@
+<script setup>
+import BaseBadge from "@/components/ui/BaseBadge.vue";
+import { timeAgo, truncate, countryFlag } from "@/utils/format";
+
+defineProps({
+  job: { type: Object, required: true },
+});
+</script>
+
+<template>
+  <RouterLink
+    :to="`/jobs/${job.id}`"
+    class="card p-5 block hover:shadow-md hover:-translate-y-0.5 transition group"
+  >
+    <div class="flex items-start justify-between gap-3">
+      <div class="flex-1 min-w-0">
+        <h3
+          class="font-semibold text-slate-800 group-hover:text-brand-600 transition truncate"
+        >
+          {{ job.titre }}
+        </h3>
+
+        <p v-if="job.entreprise" class="text-sm text-slate-600 mt-1">
+          {{ job.entreprise }}
+        </p>
+
+        <div class="flex flex-wrap items-center gap-2 mt-3 text-xs">
+          <BaseBadge v-if="job.pays" variant="brand">
+            {{ countryFlag(job.pays) }} {{ job.pays }}
+          </BaseBadge>
+
+          <BaseBadge v-if="job.ville" variant="default">
+            📍 {{ job.ville }}
+          </BaseBadge>
+
+          <BaseBadge v-if="job.type_contrat" variant="info">
+            💼 {{ job.type_contrat }}
+          </BaseBadge>
+
+          <BaseBadge v-if="job.categorie" variant="accent">
+            🏷️ {{ job.categorie }}
+          </BaseBadge>
+
+          <BaseBadge v-if="job.teletravail" variant="success">
+            🌐 Teletravail
+          </BaseBadge>
+        </div>
+      </div>
+    </div>
+
+    <p v-if="job.description" class="text-sm text-slate-500 mt-3 leading-relaxed">
+      {{ truncate(job.description, 160) }}
+    </p>
+
+    <div
+      class="flex items-center justify-between mt-4 pt-3 border-t border-slate-100 text-xs text-slate-400"
+    >
+      <span>📅 {{ timeAgo(job.date_publication || job.created_at) }}</span>
+      <span class="truncate">🔗 {{ job.source }}</span>
+    </div>
+  </RouterLink>
+</template>
