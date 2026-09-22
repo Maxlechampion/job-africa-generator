@@ -3,7 +3,7 @@ fastapi==0.115.0
 uvicorn[standard]==0.32.0
 
 # ==================== Base de donnees ====================
-supabase==2.9.1
+supabase==2.31.0
 
 # ==================== Config ====================
 python-dotenv==1.0.1
