@@ -29,3 +29,13 @@ rapidfuzz==3.10.0
 pytest==8.3.3
 pytest-asyncio==0.24.0
 pytest-cov==6.0.0
+
+# === Push notifications ===
+pywebpush==2.0.0
+
+# === IA (Hugging Face) - optionnel ===
+# transformers==4.46.3
+# sentence-transformers==3.2.1
+# torch==2.5.1
+# accelerate==1.1.1
+# gliner==0.2.13
