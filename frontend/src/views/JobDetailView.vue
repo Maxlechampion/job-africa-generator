@@ -2,6 +2,7 @@
 import { onMounted } from "vue";
 import { useRoute } from "vue-router";
 import { storeToRefs } from "pinia";
+import ShareButton from "@/components/jobs/ShareButton.vue";
 
 import BaseBadge from "@/components/ui/BaseBadge.vue";
 import BaseButton from "@/components/ui/BaseButton.vue";
@@ -98,6 +99,9 @@ function apply() {
           <BaseButton size="lg" class="w-full" @click="apply">
             Postuler maintenant →
           </BaseButton>
+        <div class="mt-3">
+          <ShareButton :job="job" />
+        </div>
 
           <div class="mt-4 space-y-3 text-sm">
             <div class="flex justify-between gap-2">

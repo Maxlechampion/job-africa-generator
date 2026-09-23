@@ -1,8 +1,10 @@
 """
-Point d'entrée de l'application Job Africa API.
+Point d'entree de l'application Job Africa API.
 
-FastAPI avec CORS, healthcheck et routers.
+FastAPI avec CORS, healthcheck, scheduler et routers.
 """
+
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -11,10 +13,62 @@ from app.core.middleware import LanguageMiddleware
 from app.core.config import settings
 from app.core.logger import get_logger
 from app.services.scheduler import start_scheduler, stop_scheduler
-from app.api import jobs, stats, collect, admin, collect_ats, collect_scrapers, collect_api, admin_dedup, companies, skills, favorites, alerts, admin_sources, ai, dashboard, auth
+from app.api import (
+    jobs,
+    stats,
+    collect,
+    admin,
+    collect_ats,
+    collect_scrapers,
+    collect_api,
+    admin_dedup,
+    companies,
+    skills,
+    favorites,
+    alerts,
+    admin_sources,
+    ai,
+    dashboard,
+    auth,
+    share,
+    push,
+    payments,
+    premium,
+    sponsored,
+)
 
 
 logger = get_logger(__name__)
+
+
+# ==================== Lifespan (démarrage / arrêt) ====================
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """
+    Gère le cycle de vie de l'application.
+
+    - Au démarrage : initialise le scheduler
+    - À l'arrêt : arrête le scheduler proprement
+    """
+
+    # ==================== Démarrage ====================
+    logger.info(f"🚀 {settings.APP_NAME} v{settings.APP_VERSION}")
+    logger.info("API démarrée avec succès")
+
+    try:
+        start_scheduler()
+    except Exception as e:
+        logger.error(f"Erreur démarrage scheduler : {e}")
+
+    yield
+
+    # ==================== Arrêt ====================
+    try:
+        stop_scheduler()
+    except Exception as e:
+        logger.error(f"Erreur arrêt scheduler : {e}")
+
+    logger.info("API arrêtée")
 
 
 # ==================== Application ====================
@@ -28,10 +82,11 @@ app = FastAPI(
     docs_url="/docs",
     redoc_url="/redoc",
     openapi_url="/openapi.json",
+    lifespan=lifespan,
 )
 
 
-# ==================== CORS ====================
+# ==================== Middleware ====================
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # À restreindre en production
@@ -39,6 +94,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.add_middleware(LanguageMiddleware)
 
 
 # ==================== Routers ====================
@@ -58,12 +115,17 @@ app.include_router(admin_sources.router)
 app.include_router(ai.router)
 app.include_router(dashboard.router)
 app.include_router(auth.router)
+app.include_router(share.router)
+app.include_router(push.router)
+app.include_router(payments.router)
+app.include_router(premium.router)
+app.include_router(sponsored.router)
 
 
 # ==================== Root ====================
 @app.get("/", tags=["root"], summary="Accueil")
 def home():
-    """Point d'entrée de l'API."""
+    """Point d'entree de l'API."""
 
     return {
         "message": "Bienvenue sur Job Africa API",
@@ -75,35 +137,6 @@ def home():
 
 @app.get("/health", tags=["root"], summary="Healthcheck")
 def health():
-    """Vérification de l'état de l'API."""
+    """Verification de l'etat de l'API."""
 
     return {"status": "ok"}
-
-
-# ==================== Démarrage ====================
-@app.on_event("startup")
-async def startup_event():
-    """Actions au démarrage de l'application."""
-
-    logger.info(f"🚀 {settings.APP_NAME} v{settings.APP_VERSION}")
-    logger.info("API démarrée avec succès")
-
-
-@app.on_event("shutdown")
-
-
-# ==================== Scheduler ====================
-@app.on_event("startup")
-async def start_scheduler_event():
-    """Demarre le scheduler automatique au startup."""
-    start_scheduler()
-
-
-@app.on_event("shutdown")
-async def stop_scheduler_event():
-    """Arrete le scheduler proprement a l'arret."""
-    stop_scheduler()
-async def shutdown_event():
-    """Actions à l'arrêt de l'application."""
-
-    logger.info("API arrêtée")
