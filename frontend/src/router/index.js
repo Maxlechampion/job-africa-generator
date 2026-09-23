@@ -22,13 +22,19 @@ const routes = [
         path: "jobs/:id",
         name: "job-detail",
         component: () => import("@/views/JobDetailView.vue"),
-        meta: { title: "Detail" },
+        meta: { title: "Détail" },
       },
       {
         path: "stats",
         name: "stats",
         component: () => import("@/views/StatsView.vue"),
         meta: { title: "Statistiques" },
+      },
+      {
+        path: "pricing",
+        name: "pricing",
+        component: () => import("@/views/PricingView.vue"),
+        meta: { title: "Tarifs" },
       },
       {
         path: "login",

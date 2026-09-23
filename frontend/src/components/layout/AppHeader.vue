@@ -14,6 +14,7 @@ const links = [
   { to: "/", label: "Accueil" },
   { to: "/jobs", label: "Offres" },
   { to: "/stats", label: "Statistiques" },
+  { to: "/pricing", label: "Tarifs" },
 ];
 </script>
 
