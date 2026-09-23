@@ -1,0 +1,33 @@
+services:
+  - type: web
+    name: job-africa-generator
+    runtime: python
+    plan: free
+    region: frankfurt
+    branch: main
+    rootDir: backend
+    buildCommand: |
+      pip install --upgrade pip
+      pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_KEY
+        sync: false
+      - key: PYTHON_VERSION
+        value: "3.12"
+      - key: COLLECT_INTERVAL_HOURS
+        value: "6"
+      - key: LOG_LEVEL
+        value: "INFO"
+      - key: DEBUG
+        value: "false"
+      - key: VAPID_PUBLIC_KEY
+        sync: false
+      - key: VAPID_PRIVATE_KEY
+        sync: false
+      - key: VAPID_SUBJECT
+        value: "mailto:contact@jobafrica.app"
