@@ -1,2 +1,4 @@
 User-agent: *
 Allow: /
+
+Sitemap: https://frontend-zeta-six-12mzm0ovel.vercel.app/sitemap.xml
