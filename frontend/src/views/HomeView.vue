@@ -29,40 +29,42 @@ function search(q) {
 
 <template>
   <div>
+    <!-- HERO -->
     <section class="bg-gradient-to-br from-brand-600 to-brand-800 text-white">
-      <div class="container-page py-16 md:py-24">
+      <div class="container-page py-10 xs:py-12 sm:py-16 md:py-20 lg:py-24">
         <div class="max-w-3xl">
-          <h1 class="text-3xl md:text-5xl font-bold leading-tight">
+          <h1 class="title-hero">
             Trouvez votre prochain emploi en
             <span class="text-accent-400">Afrique de l'Ouest</span>
           </h1>
-          <p class="mt-4 text-brand-50/90 text-lg">
-            Des milliers d'offres agregees depuis les meilleures plateformes,
-            mises a jour automatiquement.
+          <p class="mt-3 sm:mt-4 text-brand-50/90 text-sm xs:text-base sm:text-lg">
+            Des milliers d'offres agrégées depuis les meilleures plateformes, mises à jour automatiquement.
           </p>
         </div>
 
-        <div class="mt-8 max-w-3xl">
+        <div class="mt-6 sm:mt-8 max-w-3xl">
           <JobSearchBar @search="search" />
         </div>
       </div>
     </section>
 
-    <section class="container-page -mt-8 relative z-10">
+    <!-- STATS -->
+    <section class="container-page -mt-6 sm:-mt-8 relative z-10">
       <JobStats />
     </section>
 
-    <section class="container-page py-14">
-      <div class="flex items-center justify-between mb-6">
+    <!-- DERNIÈRES OFFRES -->
+    <section class="container-page py-10 sm:py-14">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mb-5 sm:mb-6">
         <div>
-          <h2 class="text-2xl font-bold text-slate-800">
-            Dernieres offres publiees
+          <h2 class="title-section">
+            Dernières offres publiées
           </h2>
-          <p class="text-sm text-slate-500 mt-1">
-            Mises a jour automatiquement toutes les 6 heures.
+          <p class="text-xs sm:text-sm text-slate-500 mt-1">
+            Mises à jour automatiquement toutes les 6 heures.
           </p>
         </div>
-        <BaseButton variant="outline" @click="router.push('/jobs')">
+        <BaseButton variant="outline" @click="router.push('/jobs')" class="w-full sm:w-auto">
           Voir toutes les offres →
         </BaseButton>
       </div>
@@ -70,31 +72,38 @@ function search(q) {
       <JobList :jobs="jobs" :loading="loading" />
     </section>
 
+    <!-- COMMENT ÇA MARCHE -->
     <section class="bg-white border-y border-slate-200">
-      <div class="container-page py-14">
-        <h2 class="text-2xl font-bold text-slate-800 text-center mb-10">
-          Comment ca marche ?
+      <div class="container-page py-10 sm:py-14">
+        <h2 class="title-section text-center mb-8 sm:mb-10">
+          Comment ça marche ?
         </h2>
-        <div class="grid md:grid-cols-3 gap-6">
-          <div class="text-center p-6">
-            <div class="text-4xl mb-3">🔎</div>
-            <h3 class="font-semibold text-slate-800 mb-2">Recherchez</h3>
-            <p class="text-sm text-slate-500">
-              Filtrez par pays, ville, categorie, type de contrat ou teletravail.
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+          <div class="text-center p-4 sm:p-6">
+            <div class="text-3xl sm:text-4xl mb-3">🔎</div>
+            <h3 class="font-semibold text-slate-800 mb-2 text-sm sm:text-base">
+              Recherchez
+            </h3>
+            <p class="text-xs sm:text-sm text-slate-500">
+              Filtrez par pays, ville, catégorie, type de contrat ou télétravail.
             </p>
           </div>
-          <div class="text-center p-6">
-            <div class="text-4xl mb-3">📄</div>
-            <h3 class="font-semibold text-slate-800 mb-2">Consultez</h3>
-            <p class="text-sm text-slate-500">
-              Accedez au detail complet de chaque offre et postulez en un clic.
+          <div class="text-center p-4 sm:p-6">
+            <div class="text-3xl sm:text-4xl mb-3">📄</div>
+            <h3 class="font-semibold text-slate-800 mb-2 text-sm sm:text-base">
+              Consultez
+            </h3>
+            <p class="text-xs sm:text-sm text-slate-500">
+              Accédez au détail complet de chaque offre et postulez en un clic.
             </p>
           </div>
-          <div class="text-center p-6">
-            <div class="text-4xl mb-3">🚀</div>
-            <h3 class="font-semibold text-slate-800 mb-2">Postulez</h3>
-            <p class="text-sm text-slate-500">
-              Vous etes redirige vers la source officielle de l'offre.
+          <div class="text-center p-4 sm:p-6">
+            <div class="text-3xl sm:text-4xl mb-3">🚀</div>
+            <h3 class="font-semibold text-slate-800 mb-2 text-sm sm:text-base">
+              Postulez
+            </h3>
+            <p class="text-xs sm:text-sm text-slate-500">
+              Vous êtes redirigé vers la source officielle de l'offre.
             </p>
           </div>
         </div>

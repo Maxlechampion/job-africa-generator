@@ -2,12 +2,12 @@
 import { onMounted } from "vue";
 import { useRoute } from "vue-router";
 import { storeToRefs } from "pinia";
-import ShareButton from "@/components/jobs/ShareButton.vue";
 
 import BaseBadge from "@/components/ui/BaseBadge.vue";
 import BaseButton from "@/components/ui/BaseButton.vue";
 import BaseSpinner from "@/components/ui/BaseSpinner.vue";
 import EmptyState from "@/components/ui/EmptyState.vue";
+import ShareButton from "@/components/jobs/ShareButton.vue";
 
 import { useJobsStore } from "@/stores/jobs";
 import { formatDate, timeAgo, countryFlag } from "@/utils/format";
@@ -26,10 +26,10 @@ function apply() {
 </script>
 
 <template>
-  <div class="container-page py-8">
+  <div class="container-page py-4 sm:py-6 md:py-8">
     <RouterLink
       to="/jobs"
-      class="text-sm text-slate-500 hover:text-brand-600 inline-flex items-center gap-1 mb-4"
+      class="text-xs sm:text-sm text-slate-500 hover:text-brand-600 inline-flex items-center gap-1 mb-3 sm:mb-4"
     >
       ← Retour aux offres
     </RouterLink>
@@ -42,17 +42,18 @@ function apply() {
       :description="error || 'Cette offre n\'existe plus.'"
     />
 
-    <article v-else class="grid lg:grid-cols-[1fr_320px] gap-6">
-      <div class="card p-6 md:p-8">
-        <h1 class="text-2xl md:text-3xl font-bold text-slate-800">
+    <article v-else class="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-4 sm:gap-6">
+      <!-- Contenu principal -->
+      <div class="card">
+        <h1 class="text-xl sm:text-2xl md:text-3xl font-bold text-slate-800">
           {{ job.titre }}
         </h1>
 
-        <p v-if="job.entreprise" class="text-lg text-slate-600 mt-2">
+        <p v-if="job.entreprise" class="text-base sm:text-lg text-slate-600 mt-2">
           {{ job.entreprise }}
         </p>
 
-        <div class="flex flex-wrap gap-2 mt-4">
+        <div class="flex flex-wrap gap-1.5 sm:gap-2 mt-3 sm:mt-4">
           <BaseBadge v-if="job.pays" variant="brand">
             {{ countryFlag(job.pays) }} {{ job.pays }}
           </BaseBadge>
@@ -69,49 +70,40 @@ function apply() {
             🏷️ {{ job.categorie }}
           </BaseBadge>
           <BaseBadge v-if="job.teletravail" variant="success">
-            🌐 Teletravail
+            🌐 Télétravail
           </BaseBadge>
         </div>
 
-        <div v-if="job.resume_ia" class="mt-6 p-4 bg-brand-50 rounded-lg border border-brand-100">
-          <h2 class="text-sm font-semibold text-brand-700 mb-2">
-            🤖 Resume IA
-          </h2>
-          <p class="text-sm text-slate-700 leading-relaxed">
-            {{ job.resume_ia }}
-          </p>
-        </div>
-
-        <div class="mt-6 pt-6 border-t border-slate-100">
-          <h2 class="text-lg font-semibold text-slate-800 mb-3">
+        <div class="mt-5 sm:mt-6 pt-5 sm:pt-6 border-t border-slate-100">
+          <h2 class="text-base sm:text-lg font-semibold text-slate-800 mb-3">
             Description du poste
           </h2>
-          <div
-            class="prose prose-slate max-w-none text-sm leading-relaxed whitespace-pre-line"
-          >
+          <div class="prose prose-slate max-w-none text-sm sm:text-base leading-relaxed whitespace-pre-line">
             {{ job.description || "Aucune description disponible." }}
           </div>
         </div>
       </div>
 
-      <aside class="space-y-4 lg:sticky lg:top-20 lg:self-start">
-        <div class="card p-5">
+      <!-- Sidebar (passe en bas sur mobile) -->
+      <aside class="space-y-3 sm:space-y-4 sidebar-sticky">
+        <div class="card">
           <BaseButton size="lg" class="w-full" @click="apply">
             Postuler maintenant →
           </BaseButton>
-        <div class="mt-3">
-          <ShareButton :job="job" />
-        </div>
+
+          <div class="mt-3">
+            <ShareButton :job="job" />
+          </div>
 
           <div class="mt-4 space-y-3 text-sm">
             <div class="flex justify-between gap-2">
               <span class="text-slate-500">Source</span>
-              <span class="font-medium text-slate-800 text-right">
+              <span class="font-medium text-slate-800 text-right truncate">
                 {{ job.source }}
               </span>
             </div>
             <div class="flex justify-between gap-2">
-              <span class="text-slate-500">Publiee</span>
+              <span class="text-slate-500">Publiée</span>
               <span class="font-medium text-slate-800">
                 {{ timeAgo(job.date_publication || job.created_at) }}
               </span>
@@ -125,8 +117,8 @@ function apply() {
           </div>
         </div>
 
-        <div class="card p-5 text-xs text-slate-500">
-          💡 Astuce : verifiez toujours l'offre sur le site source avant de postuler.
+        <div class="card text-xs text-slate-500">
+          💡 Astuce : vérifiez toujours l'offre sur le site source avant de postuler.
         </div>
       </aside>
     </article>

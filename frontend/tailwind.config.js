@@ -1,6 +1,14 @@
 export default {
   content: ["./index.html", "./src/**/*.{vue,js}"],
   theme: {
+    screens: {
+      xs: "375px",   // iPhone SE, petits Android
+      sm: "640px",   // Tablettes portrait
+      md: "768px",   // Tablettes paysage
+      lg: "1024px",  // Desktop
+      xl: "1280px",  // Grand desktop
+      "2xl": "1536px", // Très grand
+    },
     extend: {
       colors: {
         brand: {
@@ -23,6 +31,10 @@ export default {
       },
       fontFamily: {
         sans: ["Inter", "system-ui", "sans-serif"],
+      },
+      spacing: {
+        "safe-top": "env(safe-area-inset-top)",
+        "safe-bottom": "env(safe-area-inset-bottom)",
       },
     },
   },
