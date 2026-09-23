@@ -7,11 +7,10 @@ Approche hybride :
     3. Construit un resume factuel de 2-3 phrases
 """
 
-import re
 import html
+import re
 
 from app.core.logger import get_logger
-
 
 logger = get_logger(__name__)
 
@@ -22,12 +21,10 @@ PHRASES_CLES = [
     r"(?:missions?|responsabilités?|attributions?)\s*:?\s*([^.]{30,300}\.)",
     r"(?:vous serez|vous aurez|le poste consiste|la mission consiste)[^.]{20,300}\.",
     r"(?:your mission|your role|responsibilities)[^.]{20,300}\.",
-
     # Profil recherché
     r"(?:profil|nous recherchons|recherché[e]?|candidat[e]?)\s*:?\s*([^.]{30,300}\.)",
     r"(?:compétences?|maîtrise|connaissance|expérience)[^.]{20,300}\.",
     r"(?:we are looking for|requirements|qualifications)[^.]{20,300}\.",
-
     # Description
     r"(?:développeur|ingénieur|chargé[e]?|responsable|manager|directeur|technicien)[^.]{30,300}\.",
 ]
@@ -87,7 +84,7 @@ def _truncate(text: str, max_length: int = 300) -> str:
     last_period = truncated.rfind(".")
 
     if last_period > max_length * 0.6:
-        return truncated[:last_period + 1]
+        return truncated[: last_period + 1]
 
     return truncated.rstrip() + "..."
 

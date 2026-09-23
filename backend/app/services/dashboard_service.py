@@ -2,11 +2,10 @@
 Service du dashboard admin.
 """
 
-from datetime import datetime, timezone, timedelta
+from datetime import UTC, datetime, timedelta
 
-from app.core.supabase import supabase
 from app.core.logger import get_logger
-
+from app.core.supabase import supabase
 
 logger = get_logger(__name__)
 
@@ -21,7 +20,7 @@ def get_kpi() -> dict:
         r = q.execute()
         return r.count or 0
 
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
 
     r_7j = (
         supabase.table("jobs")
@@ -51,14 +50,9 @@ def get_kpi() -> dict:
 def get_daily_counts(days: int = 30) -> list[dict]:
     """Offres par jour (30 derniers jours)."""
 
-    since = (datetime.now(timezone.utc) - timedelta(days=days)).isoformat()
+    since = (datetime.now(UTC) - timedelta(days=days)).isoformat()
 
-    r = (
-        supabase.table("jobs")
-        .select("created_at")
-        .gte("created_at", since)
-        .execute()
-    )
+    r = supabase.table("jobs").select("created_at").gte("created_at", since).execute()
 
     counts: dict[str, int] = {}
     for row in r.data or []:
@@ -69,7 +63,7 @@ def get_daily_counts(days: int = 30) -> list[dict]:
         counts[day] = counts.get(day, 0) + 1
 
     result = []
-    today = datetime.now(timezone.utc).date()
+    today = datetime.now(UTC).date()
 
     for i in range(days - 1, -1, -1):
         day = (today - timedelta(days=i)).isoformat()
@@ -81,11 +75,7 @@ def get_daily_counts(days: int = 30) -> list[dict]:
 def get_top_skills(limit: int = 15) -> list[dict]:
     """Top competences."""
 
-    r = (
-        supabase.table("job_skills")
-        .select("skill_id, skills(nom, categorie)")
-        .execute()
-    )
+    r = supabase.table("job_skills").select("skill_id, skills(nom, categorie)").execute()
 
     counts: dict[int, dict] = {}
 
@@ -127,12 +117,7 @@ def get_top_pays(limit: int = 10) -> list[dict]:
 def get_sources_status() -> list[dict]:
     """Statut des sources."""
 
-    r = (
-        supabase.table("sources")
-        .select("*")
-        .order("nom")
-        .execute()
-    )
+    r = supabase.table("sources").select("*").order("nom").execute()
 
     return [
         {

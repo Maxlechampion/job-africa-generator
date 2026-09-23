@@ -2,11 +2,10 @@
 Service des offres sponsorisees et bannieres publicitaires.
 """
 
-from datetime import datetime, timezone, timedelta
+from datetime import UTC, datetime, timedelta
 
-from app.core.supabase import supabase
 from app.core.logger import get_logger
-
+from app.core.supabase import supabase
 
 logger = get_logger(__name__)
 
@@ -17,7 +16,7 @@ TABLE_BANNERS = "banners"
 def activate_sponsored(job_id: int, company_id: int | None = None) -> dict | None:
     """Active le statut sponsorise sur une offre pour 30 jours."""
 
-    until = datetime.now(timezone.utc) + timedelta(days=30)
+    until = datetime.now(UTC) + timedelta(days=30)
 
     payload = {
         "is_sponsored": True,
@@ -27,12 +26,7 @@ def activate_sponsored(job_id: int, company_id: int | None = None) -> dict | Non
     }
 
     try:
-        r = (
-            supabase.table(TABLE_JOBS)
-            .update(payload)
-            .eq("id", job_id)
-            .execute()
-        )
+        r = supabase.table(TABLE_JOBS).update(payload).eq("id", job_id).execute()
         logger.info(f"Offre #{job_id} sponsorisee")
         return r.data[0] if r.data else None
     except Exception as e:
@@ -43,7 +37,7 @@ def activate_sponsored(job_id: int, company_id: int | None = None) -> dict | Non
 def deactivate_expired_sponsored() -> int:
     """Desactive les offres sponsorisees expirees."""
 
-    now = datetime.now(timezone.utc).isoformat()
+    now = datetime.now(UTC).isoformat()
 
     try:
         r = (
@@ -73,7 +67,7 @@ def create_banner(
 ) -> dict | None:
     """Cree une banniere publicitaire."""
 
-    fin = datetime.now(timezone.utc) + timedelta(days=duree_jours)
+    fin = datetime.now(UTC) + timedelta(days=duree_jours)
 
     payload = {
         "company_id": company_id,
@@ -98,12 +92,7 @@ def activate_banner(banner_id: int) -> dict | None:
     """Active une banniere apres paiement."""
 
     try:
-        r = (
-            supabase.table(TABLE_BANNERS)
-            .update({"actif": True})
-            .eq("id", banner_id)
-            .execute()
-        )
+        r = supabase.table(TABLE_BANNERS).update({"actif": True}).eq("id", banner_id).execute()
         logger.info(f"Banniere #{banner_id} activee")
         return r.data[0] if r.data else None
     except Exception as e:
@@ -114,7 +103,7 @@ def activate_banner(banner_id: int) -> dict | None:
 def get_active_banners(placement: str) -> list[dict]:
     """Retourne les bannieres actives pour un emplacement."""
 
-    now = datetime.now(timezone.utc).isoformat()
+    now = datetime.now(UTC).isoformat()
 
     try:
         r = (

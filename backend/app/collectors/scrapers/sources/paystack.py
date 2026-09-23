@@ -49,12 +49,14 @@ class PaystackScraper(BaseScraper):
             if any(j["url"] == full_url for j in jobs):
                 continue
 
-            jobs.append(make_job(
-                titre=titre,
-                url=full_url,
-                source="Paystack",
-                entreprise="Paystack",
-                pays="Nigeria",
-            ))
+            jobs.append(
+                make_job(
+                    titre=titre,
+                    url=full_url,
+                    source="Paystack",
+                    entreprise="Paystack",
+                    pays="Nigeria",
+                )
+            )
 
         return jobs

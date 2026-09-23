@@ -12,9 +12,8 @@ from functools import lru_cache
 
 from sentence_transformers import SentenceTransformer
 
-from app.core.logger import get_logger
 from app.core.ai_config import EMBEDDINGS_MODEL
-
+from app.core.logger import get_logger
 
 logger = get_logger(__name__)
 
@@ -67,7 +66,4 @@ def semantic_search(query: str, documents: list[str], top_k: int = 5):
     scores = doc_embs @ query_emb
     indices = scores.argsort()[::-1][:top_k]
 
-    return [
-        {"index": int(i), "score": float(scores[i]), "text": documents[i]}
-        for i in indices
-    ]
+    return [{"index": int(i), "score": float(scores[i]), "text": documents[i]} for i in indices]

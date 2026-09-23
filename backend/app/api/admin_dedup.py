@@ -1,7 +1,7 @@
 """
 Routes API admin pour la deduplication et le nettoyage.
 """
-from app.services.enrichment import enrich_all_jobs
+
 from fastapi import APIRouter, Query
 
 from app.services.cleanup_service import (
@@ -9,7 +9,7 @@ from app.services.cleanup_service import (
     enrich_existing_jobs,
     find_duplicates,
 )
-
+from app.services.enrichment import enrich_all_jobs
 
 router = APIRouter(prefix="/admin/dedup", tags=["admin-dedup"])
 
@@ -26,10 +26,7 @@ def find_dup():
 
     return {
         "duplicates_found": len(duplicates),
-        "pairs": [
-            {"keep_id": k, "delete_id": d}
-            for k, d in duplicates[:50]
-        ],
+        "pairs": [{"keep_id": k, "delete_id": d} for k, d in duplicates[:50]],
     }
 
 
@@ -57,9 +54,8 @@ def enrich(limit: int = Query(5000, ge=1, le=10000)):
 
     return enrich_existing_jobs(limit)
 
+
 # ==================== Enrichissement ====================
-
-
 
 
 @router.post("/enrich-all", summary="Enrichir toutes les offres (companies + skills)")

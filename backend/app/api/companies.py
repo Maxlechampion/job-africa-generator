@@ -6,7 +6,6 @@ from fastapi import APIRouter, HTTPException
 
 from app.services.company_service import get_companies, get_company
 
-
 router = APIRouter(prefix="/companies", tags=["companies"])
 
 

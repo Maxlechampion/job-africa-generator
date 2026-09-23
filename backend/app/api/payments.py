@@ -5,13 +5,12 @@ Routes API pour les paiements.
 from fastapi import APIRouter, Depends, HTTPException
 
 from app.core.auth import get_current_user
-from app.core.payments import TARIFS, MOYENS_PAR_PAYS, PAYMENT_PROVIDER
+from app.core.payments import MOYENS_PAR_PAYS, PAYMENT_PROVIDER, TARIFS
 from app.services.payment_service import (
     create_transaction,
-    get_user_transactions,
     get_revenue_stats,
+    get_user_transactions,
 )
-
 
 router = APIRouter(prefix="/payments", tags=["payments"])
 

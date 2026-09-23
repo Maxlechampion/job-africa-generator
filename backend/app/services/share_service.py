@@ -5,17 +5,23 @@ Service de partage : tracking + generation Open Graph.
 import hashlib
 import urllib.parse
 
-from app.core.supabase import supabase
 from app.core.logger import get_logger
-
+from app.core.supabase import supabase
 
 logger = get_logger(__name__)
 
 TABLE = "shares"
 
 CANAUX_VALIDES = {
-    "whatsapp", "linkedin", "facebook", "twitter",
-    "telegram", "email", "copy", "native", "other",
+    "whatsapp",
+    "linkedin",
+    "facebook",
+    "twitter",
+    "telegram",
+    "email",
+    "copy",
+    "native",
+    "other",
 }
 
 FRONTEND_URL = "https://frontend-zeta-six-12mzm0ovel.vercel.app"
@@ -62,12 +68,7 @@ def get_job_share_stats(job_id: int) -> dict:
     """Retourne les statistiques de partage d'une offre."""
 
     try:
-        r = (
-            supabase.table(TABLE)
-            .select("canal")
-            .eq("job_id", job_id)
-            .execute()
-        )
+        r = supabase.table(TABLE).select("canal").eq("job_id", job_id).execute()
 
         rows = r.data or []
 
@@ -110,10 +111,7 @@ def build_share_urls(job: dict) -> dict:
     localisation = " · ".join(filter(None, [ville, pays]))
 
     message = (
-        f"🌍 *{titre}*\n"
-        f"{entreprise}\n"
-        f"📍 {localisation}\n\n"
-        f"👉 Voir l'offre sur Job Africa :\n{url}"
+        f"🌍 *{titre}*\n{entreprise}\n📍 {localisation}\n\n👉 Voir l'offre sur Job Africa :\n{url}"
     )
 
     message_linkedin = f"{titre} — {entreprise} · {localisation}"

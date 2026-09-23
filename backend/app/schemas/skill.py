@@ -2,14 +2,13 @@
 Schemas Pydantic pour les competences.
 """
 
-from typing import Optional
 from pydantic import BaseModel
 
 
 class SkillBase(BaseModel):
     nom: str
-    categorie: Optional[str] = None
-    alias: Optional[list[str]] = None
+    categorie: str | None = None
+    alias: list[str] | None = None
 
 
 class SkillResponse(SkillBase):
@@ -20,5 +19,5 @@ class SkillResponse(SkillBase):
 class JobSkillResponse(BaseModel):
     skill_id: int
     nom: str
-    categorie: Optional[str]
+    categorie: str | None
     score: float

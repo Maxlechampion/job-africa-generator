@@ -11,7 +11,6 @@ from app.services.sponsored_service import (
     get_active_banners,
 )
 
-
 router = APIRouter(prefix="/sponsored", tags=["sponsored"])
 
 

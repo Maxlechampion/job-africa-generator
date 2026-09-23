@@ -10,9 +10,8 @@ Vérifie les JWT Supabase et expose :
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
-from app.core.supabase import supabase
 from app.core.logger import get_logger
-
+from app.core.supabase import supabase
 
 logger = get_logger(__name__)
 
@@ -32,18 +31,12 @@ def _extract_token(credentials: HTTPAuthorizationCredentials | None) -> str:
 def _get_user_role(user_id: str) -> str:
     """
     Récupère le rôle le plus élevé de l'utilisateur.
-    
     Un utilisateur peut avoir plusieurs rôles (user + admin).
     On retourne toujours le plus élevé : admin > user.
     """
 
     try:
-        r = (
-            supabase.table("user_roles")
-            .select("role")
-            .eq("user_id", user_id)
-            .execute()
-        )
+        r = supabase.table("user_roles").select("role").eq("user_id", user_id).execute()
 
         if not r or not r.data:
             return "user"

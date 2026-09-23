@@ -13,10 +13,10 @@ Statut :
 
 from app.collectors.rss_collector import RSSCollector
 
-
 # ═══════════════════════════════════════════════════════════════
 # 1. SOURCES INTERNATIONALES REMOTE (✅ Validées)
 # ═══════════════════════════════════════════════════════════════
+
 
 class WeWorkRemotelyAllRSS(RSSCollector):
     def __init__(self):
@@ -134,6 +134,7 @@ class PythonOrgJobsRSS(RSSCollector):
 # 2. SOURCES ONG / ONU / DÉVELOPPEMENT (🟡 Probables)
 # ═══════════════════════════════════════════════════════════════
 
+
 class ReliefWebAfricaRSS(RSSCollector):
     def __init__(self):
         super().__init__(
@@ -170,12 +171,14 @@ class CoordinationSudRSS(RSSCollector):
 # 3. SOURCES AFRIQUE DE L'OUEST (🟡 Probables)
 # ═══════════════════════════════════════════════════════════════
 
+
 class AllAfricaBurkinaRSS(RSSCollector):
     """
     AllAfrica — Actualités Burkina Faso.
 
     🟡 Probable — flux RDF officiel AllAfrica [citation:3][citation:9].
     """
+
     def __init__(self):
         super().__init__(
             feed_url="https://fr.allafrica.com/tools/headlines/rdf/burkinafaso/headlines.rdf",
@@ -190,6 +193,7 @@ class AllAfricaCoteIvoireRSS(RSSCollector):
 
     🟡 Probable — flux RDF officiel AllAfrica [citation:6].
     """
+
     def __init__(self):
         super().__init__(
             feed_url="https://fr.allafrica.com/tools/headlines/rdf/cotedivoire/headlines.rdf",
@@ -204,6 +208,7 @@ class AllAfricaWestAfricaRSS(RSSCollector):
 
     🟡 Probable — flux RDF officiel AllAfrica [citation:9].
     """
+
     def __init__(self):
         super().__init__(
             feed_url="https://fr.allafrica.com/tools/headlines/rdf/westafrica/headlines.rdf",
@@ -217,6 +222,7 @@ class RmoSenegalRSS(RSSCollector):
 
     ✅ Validée — RMO indique explicitement proposer des flux RSS [citation:2].
     """
+
     def __init__(self):
         super().__init__(
             feed_url="https://www.rmo-jobcenter.com/fr/senegal/offres-emploi/rss",
@@ -231,6 +237,7 @@ class RmoCoteIvoireRSS(RSSCollector):
 
     ✅ Validée — RMO indique explicitement proposer des flux RSS.
     """
+
     def __init__(self):
         super().__init__(
             feed_url="https://www.rmo-jobcenter.com/fr/cote-ivoire/offres-emploi/rss",
@@ -245,6 +252,7 @@ class HotNigerianJobsRSS(RSSCollector):
 
     ✅ Validée — Flux RSS disponible via follow.it [citation:24].
     """
+
     def __init__(self):
         super().__init__(
             feed_url="https://follow.it/hotnigerianjobs?leanpub",
@@ -259,6 +267,7 @@ class ConcoursnRSS(RSSCollector):
 
     ✅ Validée — Flux WordPress actif [citation:8].
     """
+
     def __init__(self):
         super().__init__(
             feed_url="https://concoursn.com/tag/vendeur/feed/",
@@ -270,6 +279,7 @@ class ConcoursnRSS(RSSCollector):
 # ═══════════════════════════════════════════════════════════════
 # 4. SOURCES AFRICAINES FRANCOPHONES (✅ Validées)
 # ═══════════════════════════════════════════════════════════════
+
 
 class ProjobivoireRSS(RSSCollector):
     def __init__(self):
@@ -318,13 +328,11 @@ ALL_SOURCES = [
     NoDeskRSS,
     HackerNewsWhoIsHiringRSS,
     PythonOrgJobsRSS,
-
     # ─── ONG / ONU / Développement ───
     ReliefWebAfricaRSS,
     ReliefWebAllJobsRSS,
     UNJobsRSS,
     CoordinationSudRSS,
-
     # ─── Afrique de l'Ouest (nouvelles sources vérifiées) ───
     AllAfricaBurkinaRSS,
     AllAfricaCoteIvoireRSS,
@@ -333,7 +341,6 @@ ALL_SOURCES = [
     RmoCoteIvoireRSS,
     HotNigerianJobsRSS,
     ConcoursnRSS,
-
     # ─── Afrique francophone ───
     ProjobivoireRSS,
     LaTempeteRSS,
@@ -368,6 +375,7 @@ ALL_SOURCES = [
 # 7. RÉSUMÉ DES SOURCES
 # ═══════════════════════════════════════════════════════════════
 
+
 def get_sources_summary() -> list[dict]:
     """Retourne un résumé de toutes les sources configurées."""
     summary = []
@@ -375,18 +383,22 @@ def get_sources_summary() -> list[dict]:
     for CollectorClass in ALL_SOURCES:
         try:
             collector = CollectorClass()
-            summary.append({
-                "name": collector.name,
-                "url": getattr(collector, "feed_url", None),
-                "country": getattr(collector, "country", None),
-                "type": "rss",
-                "status": "active",
-            })
+            summary.append(
+                {
+                    "name": collector.name,
+                    "url": getattr(collector, "feed_url", None),
+                    "country": getattr(collector, "country", None),
+                    "type": "rss",
+                    "status": "active",
+                }
+            )
         except Exception as e:
-            summary.append({
-                "name": CollectorClass.__name__,
-                "error": str(e),
-                "status": "error",
-            })
+            summary.append(
+                {
+                    "name": CollectorClass.__name__,
+                    "error": str(e),
+                    "status": "error",
+                }
+            )
 
     return summary

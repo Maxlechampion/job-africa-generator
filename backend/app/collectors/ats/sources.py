@@ -10,11 +10,11 @@ Derniere mise a jour : 2026-09-17
 Total : 7 sources ATS actives
 """
 
-from app.collectors.ats.greenhouse import GreenhouseCollector
 from app.collectors.ats.ashby import AshbyCollector
-
+from app.collectors.ats.greenhouse import GreenhouseCollector
 
 # ==================== Greenhouse ====================
+
 
 class MoniepointGreenhouse(GreenhouseCollector):
     """
@@ -23,6 +23,7 @@ class MoniepointGreenhouse(GreenhouseCollector):
     Volume : ~190 offres
     API : https://boards-api.greenhouse.io/v1/boards/moniepoint/jobs
     """
+
     def __init__(self):
         super().__init__(
             token="moniepoint",
@@ -38,6 +39,7 @@ class JumiaGreenhouse(GreenhouseCollector):
     Volume : ~20 offres
     API : https://boards-api.greenhouse.io/v1/boards/jumia/jobs
     """
+
     def __init__(self):
         super().__init__(
             token="jumia",
@@ -52,6 +54,7 @@ class CarbonGreenhouse(GreenhouseCollector):
     Volume : ~13 offres
     API : https://boards-api.greenhouse.io/v1/boards/carbon/jobs
     """
+
     def __init__(self):
         super().__init__(
             token="carbon",
@@ -62,6 +65,7 @@ class CarbonGreenhouse(GreenhouseCollector):
 
 # ==================== Ashby ====================
 
+
 class AndelaAshby(AshbyCollector):
     """
     Andela - Talent marketplace africain.
@@ -69,6 +73,7 @@ class AndelaAshby(AshbyCollector):
     Volume : ~17 offres
     API : https://api.ashbyhq.com/posting-api/job-board/andela
     """
+
     def __init__(self):
         super().__init__(
             board_name="andela",
@@ -84,6 +89,7 @@ class MKOPAAshby(AshbyCollector):
     Volume : ~43 offres
     API : https://api.ashbyhq.com/posting-api/job-board/m-kopa
     """
+
     def __init__(self):
         super().__init__(
             board_name="m-kopa",
@@ -99,6 +105,7 @@ class LemfiAshby(AshbyCollector):
     Volume : ~21 offres
     API : https://api.ashbyhq.com/posting-api/job-board/lemfi
     """
+
     def __init__(self):
         super().__init__(
             board_name="lemfi",
@@ -114,6 +121,7 @@ class SabiAshby(AshbyCollector):
     Volume : ~9 offres
     API : https://api.ashbyhq.com/posting-api/job-board/sabi
     """
+
     def __init__(self):
         super().__init__(
             board_name="sabi",
@@ -128,7 +136,6 @@ ALL_ATS_SOURCES = [
     MoniepointGreenhouse,
     JumiaGreenhouse,
     CarbonGreenhouse,
-
     # Ashby
     AndelaAshby,
     MKOPAAshby,
@@ -144,18 +151,22 @@ def get_ats_sources_summary() -> list[dict]:
     for CollectorClass in ALL_ATS_SOURCES:
         try:
             collector = CollectorClass()
-            summary.append({
-                "name": collector.name,
-                "ats_type": collector.ats_type,
-                "country": getattr(collector, "country", None),
-                "api_url": getattr(collector, "api_url", None),
-                "status": "active",
-            })
+            summary.append(
+                {
+                    "name": collector.name,
+                    "ats_type": collector.ats_type,
+                    "country": getattr(collector, "country", None),
+                    "api_url": getattr(collector, "api_url", None),
+                    "status": "active",
+                }
+            )
         except Exception as e:
-            summary.append({
-                "name": CollectorClass.__name__,
-                "error": str(e),
-                "status": "error",
-            })
+            summary.append(
+                {
+                    "name": CollectorClass.__name__,
+                    "error": str(e),
+                    "status": "error",
+                }
+            )
 
     return summary

@@ -6,7 +6,6 @@ Support : fr (defaut), en.
 
 from typing import Literal
 
-
 Lang = Literal["fr", "en"]
 
 
@@ -36,7 +35,6 @@ TRANSLATIONS: dict[str, dict[Lang, str]] = {
         "fr": "Gerer mes alertes",
         "en": "Manage my alerts",
     },
-
     # Erreurs API
     "error_not_found": {
         "fr": "Ressource introuvable",

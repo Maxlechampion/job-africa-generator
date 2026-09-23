@@ -19,18 +19,15 @@ Utilisation :
     jobs = scraper.safe_collect()
 """
 
+from urllib.parse import urljoin
+
 import httpx
 from bs4 import BeautifulSoup
-from urllib.parse import urljoin
 
 from app.collectors.base import BaseCollector
 
-
 # ==================== Configuration ====================
-USER_AGENT = (
-    "Mozilla/5.0 (compatible; JobAfricaBot/1.0; "
-    "+https://job-africa.vercel.app)"
-)
+USER_AGENT = "Mozilla/5.0 (compatible; JobAfricaBot/1.0; +https://job-africa.vercel.app)"
 DEFAULT_TIMEOUT = 15
 
 
@@ -94,8 +91,7 @@ class HTMLScraper(BaseCollector):
 
         if not items:
             self.logger.warning(
-                f"Aucun élément trouvé avec le sélecteur "
-                f"'{self.selectors['item']}' sur {self.url}"
+                f"Aucun élément trouvé avec le sélecteur '{self.selectors['item']}' sur {self.url}"
             )
             return []
 
@@ -133,9 +129,7 @@ class HTMLScraper(BaseCollector):
             return None
 
         # Résout les URLs relatives
-        if href.startswith("/") and self.base_url:
-            href = urljoin(self.base_url, href)
-        elif not href.startswith("http") and self.base_url:
+        if href.startswith("/") and self.base_url or not href.startswith("http") and self.base_url:
             href = urljoin(self.base_url, href)
 
         # Description

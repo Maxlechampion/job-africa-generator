@@ -11,7 +11,6 @@ from app.services.job_service import (
     get_stats,
 )
 
-
 router = APIRouter(tags=["stats"])
 
 

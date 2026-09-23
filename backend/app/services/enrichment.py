@@ -8,16 +8,15 @@ Cree automatiquement :
     - les liens job <-> skill
 """
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
-from app.core.supabase import supabase
 from app.core.logger import get_logger
+from app.core.supabase import supabase
 from app.services.company_service import get_or_create_company
 from app.services.skill_service import (
     get_or_create_skill,
     link_job_to_skill,
 )
-
 
 logger = get_logger(__name__)
 TABLE = "jobs"
@@ -27,23 +26,55 @@ TABLE = "jobs"
 # (sera ameliore par le module 08 IA)
 
 SKILLS_BASIC = [
-    "Python", "JavaScript", "TypeScript", "Java", "PHP", "Ruby", "Go", "Rust",
-    "SQL", "PostgreSQL", "MySQL", "MongoDB", "Redis",
-    "Django", "Flask", "FastAPI", "Vue", "React", "Angular", "Next.js", "Laravel",
-    "Docker", "Kubernetes", "Git", "CI/CD", "AWS", "Azure", "GCP",
-    "Linux", "Bash",
-    "Excel", "Word", "PowerPoint", "SAP", "QuickBooks",
-    "SEO", "Google Analytics", "Facebook Ads", "HubSpot",
-    "Figma", "Photoshop", "Illustrator",
+    "Python",
+    "JavaScript",
+    "TypeScript",
+    "Java",
+    "PHP",
+    "Ruby",
+    "Go",
+    "Rust",
+    "SQL",
+    "PostgreSQL",
+    "MySQL",
+    "MongoDB",
+    "Redis",
+    "Django",
+    "Flask",
+    "FastAPI",
+    "Vue",
+    "React",
+    "Angular",
+    "Next.js",
+    "Laravel",
+    "Docker",
+    "Kubernetes",
+    "Git",
+    "CI/CD",
+    "AWS",
+    "Azure",
+    "GCP",
+    "Linux",
+    "Bash",
+    "Excel",
+    "Word",
+    "PowerPoint",
+    "SAP",
+    "QuickBooks",
+    "SEO",
+    "Google Analytics",
+    "Facebook Ads",
+    "HubSpot",
+    "Figma",
+    "Photoshop",
+    "Illustrator",
 ]
 
 
 def detect_skills(job: dict) -> list[str]:
     """Detecte les competences basiques dans une offre."""
 
-    texte = (
-        f"{job.get('titre', '')} {job.get('description', '') or ''}"
-    ).lower()
+    texte = (f"{job.get('titre', '')} {job.get('description', '') or ''}").lower()
 
     found = []
 
@@ -90,7 +121,7 @@ def enrich_job(job_id: int, job: dict) -> dict:
     # ==================== 3. Met a jour l'offre ====================
     update_payload = {
         "company_id": company_id,
-        "enriched_at": datetime.now(timezone.utc).isoformat(),
+        "enriched_at": datetime.now(UTC).isoformat(),
     }
 
     update_payload = {k: v for k, v in update_payload.items() if v is not None}
@@ -110,13 +141,7 @@ def enrich_job(job_id: int, job: dict) -> dict:
 def enrich_all_jobs(limit: int = 5000) -> dict:
     """Enrichit toutes les offres."""
 
-    r = (
-        supabase.table(TABLE)
-        .select("*")
-        .is_("company_id", "null")
-        .limit(limit)
-        .execute()
-    )
+    r = supabase.table(TABLE).select("*").is_("company_id", "null").limit(limit).execute()
 
     jobs = r.data or []
 

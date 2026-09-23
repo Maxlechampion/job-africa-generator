@@ -15,12 +15,11 @@ import time
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.interval import IntervalTrigger
 
+from app.collectors.sources.relay_rss import ALL_SOURCES
 from app.core.config import settings
 from app.core.logger import get_logger
-from app.collectors.sources.relay_rss import ALL_SOURCES
 from app.services.job_service import bulk_create_jobs
 from app.services.log_service import log_collect
-
 
 logger = get_logger(__name__)
 
@@ -79,13 +78,15 @@ def run_all_collectors() -> dict:
                     duree_secondes=round(duree, 2),
                 )
 
-                details.append({
-                    "source": source_name,
-                    "status": "empty",
-                    "collected": 0,
-                    "inserted": 0,
-                    "skipped": 0,
-                })
+                details.append(
+                    {
+                        "source": source_name,
+                        "status": "empty",
+                        "collected": 0,
+                        "inserted": 0,
+                        "skipped": 0,
+                    }
+                )
 
                 logger.info(f"  [SKIP] {source_name} : aucune offre")
                 continue
@@ -110,14 +111,16 @@ def run_all_collectors() -> dict:
                 duree_secondes=round(duree, 2),
             )
 
-            details.append({
-                "source": source_name,
-                "status": "success",
-                "collected": collected,
-                "inserted": inserted,
-                "skipped": skipped,
-                "duration": round(duree, 2),
-            })
+            details.append(
+                {
+                    "source": source_name,
+                    "status": "success",
+                    "collected": collected,
+                    "inserted": inserted,
+                    "skipped": skipped,
+                    "duration": round(duree, 2),
+                }
+            )
 
             logger.info(
                 f"  [OK] {source_name} : "
@@ -143,12 +146,14 @@ def run_all_collectors() -> dict:
                 erreur=error_msg,
             )
 
-            details.append({
-                "source": source_name,
-                "status": "error",
-                "error": error_msg,
-                "duration": round(duree, 2),
-            })
+            details.append(
+                {
+                    "source": source_name,
+                    "status": "error",
+                    "error": error_msg,
+                    "duration": round(duree, 2),
+                }
+            )
 
             logger.error(f"  [ERR] {source_name} : {error_msg}")
 
@@ -243,15 +248,14 @@ def get_scheduler_status() -> dict:
 
     if scheduler.running:
         for job in scheduler.get_jobs():
-            jobs.append({
-                "id": job.id,
-                "name": job.name,
-                "next_run": (
-                    job.next_run_time.isoformat()
-                    if job.next_run_time else None
-                ),
-                "trigger": str(job.trigger),
-            })
+            jobs.append(
+                {
+                    "id": job.id,
+                    "name": job.name,
+                    "next_run": (job.next_run_time.isoformat() if job.next_run_time else None),
+                    "trigger": str(job.trigger),
+                }
+            )
 
     return {
         "running": scheduler.running,

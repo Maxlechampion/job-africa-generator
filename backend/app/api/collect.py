@@ -7,10 +7,9 @@ enregistrées et d'insérer les offres en base.
 
 from fastapi import APIRouter
 
-from app.core.logger import get_logger
 from app.collectors.sources.relay_rss import ALL_SOURCES
+from app.core.logger import get_logger
 from app.services.job_service import bulk_create_jobs
-
 
 logger = get_logger(__name__)
 
@@ -40,12 +39,14 @@ def collect_jobs():
         collected = len(jobs)
 
         if collected == 0:
-            details.append({
-                "source": collector.name,
-                "collected": 0,
-                "inserted": 0,
-                "skipped": 0,
-            })
+            details.append(
+                {
+                    "source": collector.name,
+                    "collected": 0,
+                    "inserted": 0,
+                    "skipped": 0,
+                }
+            )
             continue
 
         # ==================== Insertion en base ====================
@@ -58,18 +59,17 @@ def collect_jobs():
         total_inserted += inserted
         total_skipped += skipped
 
-        details.append({
-            "source": collector.name,
-            "collected": collected,
-            "inserted": inserted,
-            "skipped": skipped,
-        })
+        details.append(
+            {
+                "source": collector.name,
+                "collected": collected,
+                "inserted": inserted,
+                "skipped": skipped,
+            }
+        )
 
         logger.info(
-            f"{collector.name} : "
-            f"{collected} collectées, "
-            f"{inserted} insérées, "
-            f"{skipped} ignorées"
+            f"{collector.name} : {collected} collectées, {inserted} insérées, {skipped} ignorées"
         )
 
     # ==================== Résumé global ====================
@@ -100,10 +100,12 @@ def list_sources():
     for CollectorClass in ALL_SOURCES:
         collector = CollectorClass()
 
-        sources.append({
-            "name": collector.name,
-            "country": getattr(collector, "country", None),
-            "type": "rss",
-        })
+        sources.append(
+            {
+                "name": collector.name,
+                "country": getattr(collector, "country", None),
+                "type": "rss",
+            }
+        )
 
     return sources

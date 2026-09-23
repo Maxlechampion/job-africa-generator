@@ -4,9 +4,8 @@ Service de gestion des competences.
 
 from slugify import slugify
 
-from app.core.supabase import supabase
 from app.core.logger import get_logger
-
+from app.core.supabase import supabase
 
 logger = get_logger(__name__)
 TABLE_SKILLS = "skills"
@@ -22,13 +21,7 @@ def get_or_create_skill(nom: str, categorie: str | None = None) -> dict | None:
     nom = nom.strip()
     slug = slugify(nom)
 
-    existing = (
-        supabase.table(TABLE_SKILLS)
-        .select("*")
-        .eq("slug", slug)
-        .maybe_single()
-        .execute()
-    )
+    existing = supabase.table(TABLE_SKILLS).select("*").eq("slug", slug).maybe_single().execute()
 
     if existing and existing.data:
         return existing.data
@@ -70,12 +63,14 @@ def get_job_skills(job_id: int) -> list[dict]:
     result = []
     for row in r.data or []:
         sk = row.get("skills") or {}
-        result.append({
-            "skill_id": row["skill_id"],
-            "nom": sk.get("nom"),
-            "categorie": sk.get("categorie"),
-            "score": row.get("score", 1.0),
-        })
+        result.append(
+            {
+                "skill_id": row["skill_id"],
+                "nom": sk.get("nom"),
+                "categorie": sk.get("categorie"),
+                "score": row.get("score", 1.0),
+            }
+        )
 
     return result
 

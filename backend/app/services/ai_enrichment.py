@@ -13,16 +13,15 @@ Pour chaque offre :
 Les appels suivants sont rapides (~1-2s par offre).
 """
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
-from app.core.supabase import supabase
 from app.core.logger import get_logger
-from app.services.summarizer import summarize
-from app.services.skill_extractor import extract_skills, flatten_skills
-from app.services.language_detector import detect_language
+from app.core.supabase import supabase
 from app.services.experience_detector import detect_experience
+from app.services.language_detector import detect_language
+from app.services.skill_extractor import extract_skills, flatten_skills
 from app.services.skill_service import get_or_create_skill, link_job_to_skill
-
+from app.services.summarizer import summarize
 
 logger = get_logger(__name__)
 
@@ -78,7 +77,7 @@ def enrich_job_ai(job_id: int, job: dict) -> dict:
         "resume_ia": resume,
         "langue": langue,
         "niveau": niveau or job.get("niveau"),
-        "enriched_at": datetime.now(timezone.utc).isoformat(),
+        "enriched_at": datetime.now(UTC).isoformat(),
     }
 
     update_payload = {k: v for k, v in update_payload.items() if v is not None}
@@ -110,13 +109,7 @@ def enrich_all_jobs_ai(limit: int = 100) -> dict:
         Statistiques globales
     """
 
-    r = (
-        supabase.table(TABLE)
-        .select("*")
-        .is_("resume_ia", "null")
-        .limit(limit)
-        .execute()
-    )
+    r = supabase.table(TABLE).select("*").is_("resume_ia", "null").limit(limit).execute()
 
     jobs = r.data or []
 

@@ -10,14 +10,13 @@ from app.schemas.share import (
     ShareResponse,
     ShareStats,
 )
+from app.services.job_service import get_job
 from app.services.share_service import (
     build_og_data,
     build_share_urls,
     get_job_share_stats,
     record_share,
 )
-from app.services.job_service import get_job
-
 
 router = APIRouter(prefix="/share", tags=["share"])
 

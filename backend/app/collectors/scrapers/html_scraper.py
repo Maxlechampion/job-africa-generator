@@ -5,12 +5,12 @@ Utilise httpx + BeautifulSoup pour extraire les offres
 depuis une page HTML statique.
 """
 
-import httpx
-from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 
-from app.services.normalizer import clean_text, parse_date
+import httpx
+from bs4 import BeautifulSoup
 
+from app.services.normalizer import clean_text, parse_date
 
 # ==================== Configuration ====================
 USER_AGENT = (

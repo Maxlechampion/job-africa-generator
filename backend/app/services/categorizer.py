@@ -13,7 +13,6 @@ WeWorkRemotely, etc.) vers les 13 categories canoniques francaises.
 
 import re
 
-
 # ==================== Fusion des categories ====================
 # Mapping des categories anglaises et variantes vers
 # les 13 categories canoniques francaises.
@@ -42,13 +41,11 @@ CATEGORIE_FUSION = {
     "mobile development": "Informatique",
     "qa": "Informatique",
     "testing": "Informatique",
-
     # ─── → Ingenierie ───
     "engineering": "Ingenierie",
     "civil engineering": "Ingenierie",
     "mechanical engineering": "Ingenierie",
     "electrical engineering": "Ingenierie",
-
     # ─── → Commercial / Vente ───
     "sales": "Commercial / Vente",
     "business development": "Commercial / Vente",
@@ -57,7 +54,6 @@ CATEGORIE_FUSION = {
     "customer support": "Commercial / Vente",
     "account management": "Commercial / Vente",
     "account executive": "Commercial / Vente",
-
     # ─── → Marketing / Communication ───
     "marketing": "Marketing / Communication",
     "communications / digital marketing": "Marketing / Communication",
@@ -73,7 +69,6 @@ CATEGORIE_FUSION = {
     "ui design": "Marketing / Communication",
     "graphic design": "Marketing / Communication",
     "brand": "Marketing / Communication",
-
     # ─── → Direction / Management ───
     "management": "Direction / Management",
     "operations": "Direction / Management",
@@ -85,7 +80,6 @@ CATEGORIE_FUSION = {
     "strategy": "Direction / Management",
     "executive": "Direction / Management",
     "leadership": "Direction / Management",
-
     # ─── → Comptabilite / Finance ───
     "finance": "Comptabilite / Finance",
     "banking & finance": "Comptabilite / Finance",
@@ -95,20 +89,17 @@ CATEGORIE_FUSION = {
     "banking": "Comptabilite / Finance",
     "insurance": "Comptabilite / Finance",
     "treasury": "Comptabilite / Finance",
-
     # ─── → Ressources Humaines ───
     "human resources": "Ressources Humaines",
     "hr": "Ressources Humaines",
     "recruitment": "Ressources Humaines",
     "talent acquisition": "Ressources Humaines",
     "people operations": "Ressources Humaines",
-
     # ─── → Juridique ───
     "legal": "Juridique",
     "legal & compliance": "Juridique",
     "compliance": "Juridique",
     "law": "Juridique",
-
     # ─── → Sante ───
     "healthcare": "Sante",
     "health": "Sante",
@@ -116,27 +107,23 @@ CATEGORIE_FUSION = {
     "pharma": "Sante",
     "pharmaceutical": "Sante",
     "nursing": "Sante",
-
     # ─── → Education / Formation ───
     "education": "Education / Formation",
     "training": "Education / Formation",
     "teaching": "Education / Formation",
     "academic": "Education / Formation",
-
     # ─── → Logistique / Transport ───
     "logistics": "Logistique / Transport",
     "transport": "Logistique / Transport",
     "supply chain": "Logistique / Transport",
     "warehouse": "Logistique / Transport",
     "shipping": "Logistique / Transport",
-
     # ─── → Hotellerie / Restauration ───
     "hospitality": "Hotellerie / Restauration",
     "restaurant": "Hotellerie / Restauration",
     "hotel": "Hotellerie / Restauration",
     "tourism": "Hotellerie / Restauration",
     "food & beverage": "Hotellerie / Restauration",
-
     # ─── → Autre (catch-all) ───
     "research": "Autre",
     "security": "Autre",
@@ -251,19 +238,19 @@ CATEGORIES = {
 # ==================== Types de contrat ====================
 TYPES_CONTRAT = {
     "CDI": r"\b(cdi|contrat a duree indeterminee|permanent|"
-           r"full[- ]?time|temps plein)\b",
+    r"full[- ]?time|temps plein)\b",
     "CDD": r"\b(cdd|contrat a duree determinee|"
-           r"fixed[- ]?term|temporary)\b",
+    r"fixed[- ]?term|temporary)\b",
     "Stage": r"\b(stage|stagiaire|internship|intern|"
-             r"trainee)\b",
+    r"trainee)\b",
     "Alternance": r"\b(alternance|apprentissage|"
-                  r"apprentice|work[- ]?study)\b",
+    r"apprentice|work[- ]?study)\b",
     "Freelance": r"\b(freelance|independant|consultant|"
-                 r"contractor|consulting)\b",
+    r"contractor|consulting)\b",
     "Temps partiel": r"\b(temps partiel|part[- ]?time|"
-                     r"mi[- ]?temps)\b",
+    r"mi[- ]?temps)\b",
     "Benevolat": r"\b(benevolat|benevole|volunteer|"
-                 r"volunteering)\b",
+    r"volunteering)\b",
 }
 
 
@@ -271,12 +258,12 @@ TYPES_CONTRAT = {
 NIVEAUX = {
     "Stage": r"\b(stage|stagiaire|intern|internship|trainee)\b",
     "Junior": r"\b(junior|debutant|debutante|entry[- ]?level|"
-              r"jeune diplome|0[- ]?[23] ans)\b",
+    r"jeune diplome|0[- ]?[23] ans)\b",
     "Senior": r"\b(senior|confirme|confirmee|expert|experte|"
-              r"lead|principal|[5-9]\+? ans|10\+? ans|"
-              r"manager|director)\b",
+    r"lead|principal|[5-9]\+? ans|10\+? ans|"
+    r"manager|director)\b",
     "Mid": r"\b(mid[- ]?level|intermediaire|[3-4]\+? ans|"
-           r"mid\b)\b",
+    r"mid\b)\b",
 }
 
 
@@ -290,6 +277,7 @@ TELETRAVAIL_PATTERNS = [
 
 
 # ==================== Fonctions utilitaires ====================
+
 
 def normalize_categorie(value: str | None) -> str | None:
     """
@@ -336,10 +324,7 @@ def categorize(job: dict) -> str | None:
         Nom de la categorie ou None
     """
 
-    texte = (
-        f"{job.get('titre', '')} "
-        f"{job.get('description', '') or ''}"
-    ).lower()
+    texte = (f"{job.get('titre', '')} {job.get('description', '') or ''}").lower()
 
     if not texte.strip():
         return None
@@ -355,10 +340,7 @@ def categorize(job: dict) -> str | None:
 def detect_type_contrat(job: dict) -> str | None:
     """Detecte le type de contrat."""
 
-    texte = (
-        f"{job.get('titre', '')} "
-        f"{job.get('description', '') or ''}"
-    ).lower()
+    texte = (f"{job.get('titre', '')} {job.get('description', '') or ''}").lower()
 
     for contrat, pattern in TYPES_CONTRAT.items():
         if re.search(pattern, texte, re.IGNORECASE):
@@ -374,9 +356,7 @@ def detect_teletravail(job: dict) -> bool:
         return True
 
     texte = (
-        f"{job.get('titre', '')} "
-        f"{job.get('description', '') or ''} "
-        f"{job.get('ville', '') or ''}"
+        f"{job.get('titre', '')} {job.get('description', '') or ''} {job.get('ville', '') or ''}"
     ).lower()
 
     for pattern in TELETRAVAIL_PATTERNS:
@@ -389,10 +369,7 @@ def detect_teletravail(job: dict) -> bool:
 def detect_niveau(job: dict) -> str | None:
     """Detecte le niveau d'experience."""
 
-    texte = (
-        f"{job.get('titre', '')} "
-        f"{job.get('description', '') or ''}"
-    ).lower()
+    texte = (f"{job.get('titre', '')} {job.get('description', '') or ''}").lower()
 
     for niveau, pattern in NIVEAUX.items():
         if re.search(pattern, texte, re.IGNORECASE):

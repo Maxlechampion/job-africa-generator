@@ -2,11 +2,9 @@
 Client Supabase partagé.
 """
 
-from supabase import create_client, Client
-
 from app.core.config import settings
 from app.core.logger import get_logger
-
+from supabase import Client, create_client
 
 logger = get_logger(__name__)
 

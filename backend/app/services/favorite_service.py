@@ -2,9 +2,8 @@
 Service de gestion des favoris.
 """
 
-from app.core.supabase import supabase
 from app.core.logger import get_logger
-
+from app.core.supabase import supabase
 
 logger = get_logger(__name__)
 TABLE = "favorites"
@@ -15,9 +14,7 @@ def add_favorite(user_id: str, job_id: int, note: str | None = None) -> dict:
 
     payload = {"user_id": user_id, "job_id": job_id, "note": note}
 
-    r = supabase.table(TABLE).upsert(
-        payload, on_conflict="user_id,job_id"
-    ).execute()
+    r = supabase.table(TABLE).upsert(payload, on_conflict="user_id,job_id").execute()
 
     return r.data[0] if r.data else {}
 

@@ -47,11 +47,13 @@ class ZonemploiScraper(BaseScraper):
             if any(j["url"] == full_url for j in jobs):
                 continue
 
-            jobs.append(make_job(
-                titre=titre,
-                url=full_url,
-                source="Zonemploi",
-                pays="Niger",
-            ))
+            jobs.append(
+                make_job(
+                    titre=titre,
+                    url=full_url,
+                    source="Zonemploi",
+                    pays="Niger",
+                )
+            )
 
         return jobs

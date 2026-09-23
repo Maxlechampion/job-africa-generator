@@ -15,7 +15,6 @@ import httpx
 from app.collectors.api.base_api import BaseAPICollector
 from app.services.normalizer import clean_text
 
-
 # ==================== Mapping type de contrat ====================
 JOB_TYPE_MAP = {
     "full_time": "CDI",
@@ -74,12 +73,7 @@ class ProGigFinderCollector(BaseAPICollector):
         if isinstance(data, list):
             jobs_data = data
         elif isinstance(data, dict):
-            jobs_data = (
-                data.get("jobs")
-                or data.get("data")
-                or data.get("results")
-                or []
-            )
+            jobs_data = data.get("jobs") or data.get("data") or data.get("results") or []
         else:
             jobs_data = []
 
@@ -101,10 +95,7 @@ class ProGigFinderCollector(BaseAPICollector):
 
         # Construit une URL canonique a partir de l'ID
         job_id = item.get("id")
-        url = (
-            f"https://www.progigfinder.com/jobs/{job_id}"
-            if job_id else None
-        )
+        url = f"https://www.progigfinder.com/jobs/{job_id}" if job_id else None
 
         if not url:
             return None

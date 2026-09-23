@@ -4,7 +4,6 @@ Detection du niveau d'experience (Junior / Mid / Senior).
 
 import re
 
-
 PATTERNS = {
     "Stage": [
         r"\b(stage|stagiaire|internship|intern|trainee)\b",
@@ -31,10 +30,7 @@ PATTERNS = {
 def detect_experience(job: dict) -> str | None:
     """Detecte le niveau d'experience."""
 
-    texte = (
-        f"{job.get('titre', '')} "
-        f"{job.get('description', '') or ''}"
-    ).lower()
+    texte = (f"{job.get('titre', '')} {job.get('description', '') or ''}").lower()
 
     for niveau, regexes in PATTERNS.items():
         for regex in regexes:

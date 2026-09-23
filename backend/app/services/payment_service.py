@@ -3,12 +3,11 @@ Service de paiement abstrait.
 """
 
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
-from app.core.supabase import supabase
 from app.core.logger import get_logger
 from app.core.payments import PAYMENT_PROVIDER, TARIFS
-
+from app.core.supabase import supabase
 
 logger = get_logger(__name__)
 
@@ -69,18 +68,13 @@ def confirm_transaction(
     try:
         payload = {
             "statut": "paid",
-            "paid_at": datetime.now(timezone.utc).isoformat(),
+            "paid_at": datetime.now(UTC).isoformat(),
         }
 
         if provider_transaction_id:
             payload["provider_transaction_id"] = provider_transaction_id
 
-        r = (
-            supabase.table(TABLE)
-            .update(payload)
-            .eq("reference", reference)
-            .execute()
-        )
+        r = supabase.table(TABLE).update(payload).eq("reference", reference).execute()
 
         transaction = r.data[0] if r.data else None
 
@@ -105,24 +99,29 @@ def _apply_benefits(transaction: dict):
             job_id = metadata.get("job_id")
             if job_id:
                 from app.services.premium_service import activate_premium
+
                 activate_premium(job_id, transaction["user_id"])
 
         elif type_tx == "sponsored_job":
             job_id = metadata.get("job_id")
             if job_id:
                 from app.services.sponsored_service import activate_sponsored
+
                 activate_sponsored(job_id, transaction.get("company_id"))
 
         elif type_tx == "subscription_premium":
             from app.services.premium_service import activate_subscription
+
             activate_subscription(transaction["user_id"], "premium")
 
         elif type_tx == "subscription_pro":
             from app.services.premium_service import activate_subscription
+
             activate_subscription(transaction["user_id"], "pro")
 
         elif type_tx == "banner_week":
             from app.services.sponsored_service import activate_banner
+
             banner_id = metadata.get("banner_id")
             if banner_id:
                 activate_banner(banner_id)
@@ -151,12 +150,7 @@ def get_revenue_stats() -> dict:
     """Statistiques de revenus (admin)."""
 
     try:
-        r = (
-            supabase.table(TABLE)
-            .select("montant, type, statut")
-            .eq("statut", "paid")
-            .execute()
-        )
+        r = supabase.table(TABLE).select("montant, type, statut").eq("statut", "paid").execute()
 
         rows = r.data or []
         total = sum(row.get("montant", 0) for row in rows)

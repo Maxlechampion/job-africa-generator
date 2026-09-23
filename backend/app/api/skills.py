@@ -4,8 +4,7 @@ Routes API pour les competences.
 
 from fastapi import APIRouter
 
-from app.services.skill_service import get_skills, get_job_skills
-
+from app.services.skill_service import get_job_skills, get_skills
 
 router = APIRouter(tags=["skills"])
 

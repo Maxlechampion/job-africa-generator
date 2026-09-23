@@ -4,6 +4,9 @@ Routes API d'authentification.
 
 from fastapi import APIRouter, Depends, HTTPException, status
 
+from app.core.auth import _get_user_role, get_current_user
+from app.core.logger import get_logger
+from app.core.supabase import supabase
 from app.schemas.auth import (
     AuthResponse,
     AuthUser,
@@ -11,10 +14,6 @@ from app.schemas.auth import (
     RefreshRequest,
     SignupRequest,
 )
-from app.core.supabase import supabase
-from app.core.auth import get_current_user, _get_user_role
-from app.core.logger import get_logger
-
 
 logger = get_logger(__name__)
 
@@ -26,13 +25,15 @@ def signup(payload: SignupRequest):
     """Cree un nouveau compte utilisateur."""
 
     try:
-        response = supabase.auth.sign_up({
-            "email": payload.email,
-            "password": payload.password,
-            "options": {
-                "data": {"nom": payload.nom} if payload.nom else {},
-            },
-        })
+        response = supabase.auth.sign_up(
+            {
+                "email": payload.email,
+                "password": payload.password,
+                "options": {
+                    "data": {"nom": payload.nom} if payload.nom else {},
+                },
+            }
+        )
 
         if not response.user:
             raise HTTPException(
@@ -69,10 +70,12 @@ def login(payload: LoginRequest):
     """Connexion avec email et mot de passe."""
 
     try:
-        response = supabase.auth.sign_in_with_password({
-            "email": payload.email,
-            "password": payload.password,
-        })
+        response = supabase.auth.sign_in_with_password(
+            {
+                "email": payload.email,
+                "password": payload.password,
+            }
+        )
 
         if not response.user or not response.session:
             raise HTTPException(

@@ -2,9 +2,8 @@
 Service de gestion des sources de collecte.
 """
 
-from app.core.supabase import supabase
 from app.core.logger import get_logger
-
+from app.core.supabase import supabase
 
 logger = get_logger(__name__)
 TABLE = "sources"

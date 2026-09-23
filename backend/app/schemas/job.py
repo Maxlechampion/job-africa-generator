@@ -3,7 +3,6 @@ Schémas Pydantic pour les offres d'emploi.
 """
 
 from datetime import datetime
-from typing import Optional
 
 from pydantic import BaseModel, Field, HttpUrl, field_validator
 
@@ -16,15 +15,15 @@ class JobCreate(BaseModel):
     """
 
     titre: str = Field(..., min_length=1, max_length=300)
-    entreprise: Optional[str] = Field(None, max_length=200)
-    pays: Optional[str] = Field(None, max_length=100)
-    ville: Optional[str] = Field(None, max_length=100)
-    description: Optional[str] = None
-    type_contrat: Optional[str] = Field(None, max_length=50)
-    niveau: Optional[str] = Field(None, max_length=50)
-    categorie: Optional[str] = Field(None, max_length=100)
-    date_publication: Optional[datetime] = None
-    date_expiration: Optional[datetime] = None
+    entreprise: str | None = Field(None, max_length=200)
+    pays: str | None = Field(None, max_length=100)
+    ville: str | None = Field(None, max_length=100)
+    description: str | None = None
+    type_contrat: str | None = Field(None, max_length=50)
+    niveau: str | None = Field(None, max_length=50)
+    categorie: str | None = Field(None, max_length=100)
+    date_publication: datetime | None = None
+    date_expiration: datetime | None = None
     url: HttpUrl
     source: str = Field(..., min_length=1, max_length=100)
     teletravail: bool = False
@@ -50,8 +49,8 @@ class JobResponse(JobCreate):
     """Schéma de réponse pour une offre."""
 
     id: int
-    created_at: Optional[datetime] = None
-    updated_at: Optional[datetime] = None
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
 
     model_config = {
         "from_attributes": True,

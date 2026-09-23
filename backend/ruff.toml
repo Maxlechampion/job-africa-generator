@@ -1,0 +1,37 @@
+# Configuration Ruff pour Job Africa
+# https://docs.astral.sh/ruff/configuration/
+
+line-length = 100
+target-version = "py311"
+
+[lint]
+select = [
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "F",    # pyflakes
+    "I",    # isort
+    "UP",   # pyupgrade
+]
+
+# Ignore les règles trop strictes pour ce projet
+ignore = [
+    "BLE001",   # Do not catch blind exception
+    "B008",     # Do not perform function call in argument defaults
+    "ISC004",   # Unparenthesized implicit string concatenation
+    "S110",     # try-except-pass
+    "DTZ005",   # datetime.now without tz
+    "DTZ007",   # datetime.strptime without tz
+    "RUF013",   # PEP 484 prohibits implicit Optional
+    "SIM103",   # Return the condition directly
+    "PLR1711",  # Useless return statement
+    "RET501",   # Do not explicitly return None
+]
+
+[lint.per-file-ignores]
+# Ignore les règles dans les fichiers spécifiques
+"app/services/*.py" = ["BLE001", "S110"]
+"app/collectors/**/*.py" = ["BLE001"]
+"app/main.py" = ["BLE001"]
+
+[lint.isort]
+known-first-party = ["app"]

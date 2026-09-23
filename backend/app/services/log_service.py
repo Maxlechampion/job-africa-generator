@@ -5,11 +5,10 @@ Enregistre chaque passage de collecte dans la table collect_logs
 pour permettre un suivi et un debug a posteriori.
 """
 
-from datetime import datetime, timezone, timedelta
+from datetime import UTC, datetime, timedelta
 
-from app.core.supabase import supabase
 from app.core.logger import get_logger
-
+from app.core.supabase import supabase
 
 logger = get_logger(__name__)
 
@@ -53,11 +52,7 @@ def get_logs(limit: int = 50) -> list[dict]:
 
     try:
         response = (
-            supabase.table(TABLE)
-            .select("*")
-            .order("created_at", desc=True)
-            .limit(limit)
-            .execute()
+            supabase.table(TABLE).select("*").order("created_at", desc=True).limit(limit).execute()
         )
         return response.data or []
 
@@ -88,30 +83,19 @@ def get_logs_by_source(source_nom: str, limit: int = 20) -> list[dict]:
 def get_stats_24h() -> dict:
     """Statistiques des collectes sur les 24 dernieres heures."""
 
-    since = (datetime.now(timezone.utc) - timedelta(hours=24)).isoformat()
+    since = (datetime.now(UTC) - timedelta(hours=24)).isoformat()
 
     try:
-        response = (
-            supabase.table(TABLE)
-            .select("*")
-            .gte("created_at", since)
-            .execute()
-        )
+        response = supabase.table(TABLE).select("*").gte("created_at", since).execute()
 
         rows = response.data or []
 
         return {
             "periode": "24h",
             "total_collectes": len(rows),
-            "total_offres_collectees": sum(
-                r.get("offres_collectees", 0) for r in rows
-            ),
-            "total_offres_inserees": sum(
-                r.get("offres_inserees", 0) for r in rows
-            ),
-            "total_erreurs": sum(
-                1 for r in rows if r.get("statut") == "error"
-            ),
+            "total_offres_collectees": sum(r.get("offres_collectees", 0) for r in rows),
+            "total_offres_inserees": sum(r.get("offres_inserees", 0) for r in rows),
+            "total_erreurs": sum(1 for r in rows if r.get("statut") == "error"),
         }
 
     except Exception as e:

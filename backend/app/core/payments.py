@@ -4,7 +4,6 @@ Configuration des agregateurs de paiement pour l'Afrique de l'Ouest.
 
 import os
 
-
 # ==================== Agregateur actif ====================
 PAYMENT_PROVIDER = os.getenv("PAYMENT_PROVIDER", "manual")
 

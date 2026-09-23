@@ -4,16 +4,15 @@ Routes API admin pour le scheduler et les logs.
 
 from fastapi import APIRouter, HTTPException
 
-from app.services.scheduler import (
-    get_scheduler_status,
-    run_all_collectors,
-)
 from app.services.log_service import (
     get_logs,
     get_logs_by_source,
     get_stats_24h,
 )
-
+from app.services.scheduler import (
+    get_scheduler_status,
+    run_all_collectors,
+)
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 

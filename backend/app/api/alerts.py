@@ -14,7 +14,6 @@ from app.services.alert_service import (
     update_alert,
 )
 
-
 router = APIRouter(prefix="/alerts", tags=["alerts"])
 
 
@@ -50,4 +49,3 @@ def remove(
 ):
     """Supprime une alerte."""
     delete_alert(user_id, alert_id)
-    return None

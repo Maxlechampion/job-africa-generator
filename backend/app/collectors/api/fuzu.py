@@ -8,6 +8,7 @@ Fuzu est present au Kenya, Ouganda, Nigeria, Ghana, Malawi.
 """
 
 import os
+
 import httpx
 
 from app.collectors.api.base_api import BaseAPICollector

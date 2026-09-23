@@ -3,22 +3,22 @@ Schemas Pydantic pour les entreprises.
 """
 
 from datetime import datetime
-from typing import Optional
+
 from pydantic import BaseModel
 
 
 class CompanyBase(BaseModel):
     nom: str
-    secteur: Optional[str] = None
-    taille: Optional[str] = None
-    site_web: Optional[str] = None
-    logo_url: Optional[str] = None
-    description: Optional[str] = None
-    pays: Optional[str] = None
-    ville: Optional[str] = None
+    secteur: str | None = None
+    taille: str | None = None
+    site_web: str | None = None
+    logo_url: str | None = None
+    description: str | None = None
+    pays: str | None = None
+    ville: str | None = None
 
 
 class CompanyResponse(CompanyBase):
     id: int
     slug: str
-    created_at: Optional[datetime] = None
+    created_at: datetime | None = None

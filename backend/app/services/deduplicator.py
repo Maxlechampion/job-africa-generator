@@ -15,7 +15,6 @@ from rapidfuzz import fuzz
 from app.core.logger import get_logger
 from app.services.normalizer import job_fingerprint
 
-
 logger = get_logger(__name__)
 
 
@@ -110,8 +109,7 @@ def deduplicate(jobs: list[dict]) -> list[dict]:
 
     if doublons:
         logger.info(
-            f"Deduplication : {len(jobs)} -> {len(uniques)} "
-            f"({doublons} doublon(s) supprime(s))"
+            f"Deduplication : {len(jobs)} -> {len(uniques)} ({doublons} doublon(s) supprime(s))"
         )
 
     return uniques

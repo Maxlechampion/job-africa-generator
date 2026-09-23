@@ -13,7 +13,6 @@ from fastapi import APIRouter, HTTPException
 
 from app.core.logger import get_logger
 
-
 logger = get_logger(__name__)
 
 router = APIRouter(prefix="/ai", tags=["ai"])
@@ -21,12 +20,12 @@ router = APIRouter(prefix="/ai", tags=["ai"])
 
 # ==================== Verification des packages IA ====================
 try:
-    from app.services.summarizer import summarize
-    from app.services.skill_extractor import extract_skills, flatten_skills
-    from app.services.language_detector import detect_language
-    from app.services.embeddings import encode, similarity
     from app.services.ai_enrichment import enrich_all_jobs_ai, enrich_job_ai
+    from app.services.embeddings import encode
     from app.services.job_service import get_job, get_jobs
+    from app.services.language_detector import detect_language
+    from app.services.skill_extractor import extract_skills, flatten_skills
+    from app.services.summarizer import summarize
 
     AI_AVAILABLE = True
     logger.info("Modules IA charges avec succes")
@@ -146,10 +145,7 @@ def match_jobs(profil: str, limit: int = 10):
     if not jobs:
         return []
 
-    job_texts = [
-        f"{j.get('titre', '')}. {j.get('description', '') or ''}"
-        for j in jobs
-    ]
+    job_texts = [f"{j.get('titre', '')}. {j.get('description', '') or ''}" for j in jobs]
 
     all_texts = [profil] + job_texts
     embeddings = encode(all_texts)

@@ -29,7 +29,6 @@ class BaseScraper(ABC):
     @abstractmethod
     def collect(self) -> list[dict]:
         """Recupere les offres depuis le site."""
-        pass
 
     def safe_collect(self) -> list[dict]:
         """Wrapper avec gestion d'erreur."""

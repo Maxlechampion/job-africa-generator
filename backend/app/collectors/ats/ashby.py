@@ -37,9 +37,7 @@ class AshbyCollector(BaseATSCollector):
         self.name = source_name
         self.ats_type = "ashby"
 
-        self.api_url = (
-            f"https://api.ashbyhq.com/posting-api/job-board/{board_name}"
-        )
+        self.api_url = f"https://api.ashbyhq.com/posting-api/job-board/{board_name}"
 
     def collect(self) -> list[dict]:
         """Recupere les offres via l'API Ashby."""
@@ -83,10 +81,7 @@ class AshbyCollector(BaseATSCollector):
         teletravail = bool(item.get("isRemote", False))
         if not teletravail and location:
             location_lower = str(location).lower()
-            teletravail = any(
-                kw in location_lower
-                for kw in ["remote", "anywhere", "teletravail"]
-            )
+            teletravail = any(kw in location_lower for kw in ["remote", "anywhere", "teletravail"])
 
         published = item.get("publishedAt")
 

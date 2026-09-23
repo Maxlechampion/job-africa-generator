@@ -10,7 +10,6 @@ import sys
 
 from app.core.config import settings
 
-
 # ==================== Cache des loggers ====================
 _loggers: dict[str, logging.Logger] = {}
 

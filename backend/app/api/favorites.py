@@ -5,7 +5,7 @@ Routes API pour les favoris.
 Pour l'instant, utilise un user_id fictif pour tester.
 """
 
-from fastapi import APIRouter, HTTPException, Header
+from fastapi import APIRouter, Header, HTTPException
 
 from app.schemas.favorite import FavoriteCreate
 from app.services.favorite_service import (
@@ -14,7 +14,6 @@ from app.services.favorite_service import (
     is_favorite,
     remove_favorite,
 )
-
 
 router = APIRouter(prefix="/favorites", tags=["favorites"])
 
@@ -50,7 +49,6 @@ def delete_favorite(
 ):
     """Supprime un favori."""
     remove_favorite(user_id, job_id)
-    return None
 
 
 @router.get("/check/{job_id}")

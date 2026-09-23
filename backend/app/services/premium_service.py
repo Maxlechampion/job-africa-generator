@@ -2,12 +2,11 @@
 Service des offres premium et abonnements candidats.
 """
 
-from datetime import datetime, timezone, timedelta
+from datetime import UTC, datetime, timedelta
 
-from app.core.supabase import supabase
 from app.core.logger import get_logger
 from app.core.payments import TARIFS
-
+from app.core.supabase import supabase
 
 logger = get_logger(__name__)
 
@@ -18,7 +17,7 @@ TABLE_SUBS = "subscriptions"
 def activate_premium(job_id: int, user_id: str | None = None) -> dict | None:
     """Active le statut premium sur une offre pour 30 jours."""
 
-    until = datetime.now(timezone.utc) + timedelta(days=30)
+    until = datetime.now(UTC) + timedelta(days=30)
 
     payload = {
         "is_premium": True,
@@ -27,12 +26,7 @@ def activate_premium(job_id: int, user_id: str | None = None) -> dict | None:
     }
 
     try:
-        r = (
-            supabase.table(TABLE_JOBS)
-            .update(payload)
-            .eq("id", job_id)
-            .execute()
-        )
+        r = supabase.table(TABLE_JOBS).update(payload).eq("id", job_id).execute()
         logger.info(f"Offre #{job_id} passee en premium")
         return r.data[0] if r.data else None
     except Exception as e:
@@ -43,7 +37,7 @@ def activate_premium(job_id: int, user_id: str | None = None) -> dict | None:
 def deactivate_expired_premium() -> int:
     """Desactive les offres premium expirees."""
 
-    now = datetime.now(timezone.utc).isoformat()
+    now = datetime.now(UTC).isoformat()
 
     try:
         r = (
@@ -68,12 +62,14 @@ def activate_subscription(user_id: str, plan: str = "premium") -> dict | None:
     tarif = TARIFS.get(f"subscription_{plan}", {})
     duree = tarif.get("duree_jours", 30)
 
-    fin = datetime.now(timezone.utc) + timedelta(days=duree)
+    fin = datetime.now(UTC) + timedelta(days=duree)
 
     try:
-        supabase.table(TABLE_SUBS).update({
-            "statut": "expired",
-        }).eq("user_id", user_id).eq("statut", "active").execute()
+        supabase.table(TABLE_SUBS).update(
+            {
+                "statut": "expired",
+            }
+        ).eq("user_id", user_id).eq("statut", "active").execute()
     except Exception:
         pass
 
@@ -82,7 +78,7 @@ def activate_subscription(user_id: str, plan: str = "premium") -> dict | None:
         "plan": plan,
         "statut": "active",
         "montant": tarif.get("prix", 0),
-        "debut_at": datetime.now(timezone.utc).isoformat(),
+        "debut_at": datetime.now(UTC).isoformat(),
         "fin_at": fin.isoformat(),
     }
 
@@ -127,6 +123,6 @@ def is_premium_user(user_id: str) -> bool:
 
     try:
         fin_dt = datetime.fromisoformat(fin.replace("Z", "+00:00"))
-        return fin_dt > datetime.now(timezone.utc)
+        return fin_dt > datetime.now(UTC)
     except Exception:
         return False

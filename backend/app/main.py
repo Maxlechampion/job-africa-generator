@@ -9,34 +9,33 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.core.middleware import LanguageMiddleware
-from app.core.config import settings
-from app.core.logger import get_logger
-from app.services.scheduler import start_scheduler, stop_scheduler
 from app.api import (
-    jobs,
-    stats,
-    collect,
     admin,
-    collect_ats,
-    collect_scrapers,
-    collect_api,
     admin_dedup,
-    companies,
-    skills,
-    favorites,
-    alerts,
     admin_sources,
     ai,
-    dashboard,
+    alerts,
     auth,
-    share,
-    push,
+    collect,
+    collect_api,
+    collect_ats,
+    collect_scrapers,
+    companies,
+    dashboard,
+    favorites,
+    jobs,
     payments,
     premium,
+    push,
+    share,
+    skills,
     sponsored,
+    stats,
 )
-
+from app.core.config import settings
+from app.core.logger import get_logger
+from app.core.middleware import LanguageMiddleware
+from app.services.scheduler import start_scheduler, stop_scheduler
 
 logger = get_logger(__name__)
 
@@ -75,10 +74,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title=settings.APP_NAME,
     version=settings.APP_VERSION,
-    description=(
-        "API de collecte et de diffusion "
-        "d'offres d'emploi en Afrique de l'Ouest"
-    ),
+    description=("API de collecte et de diffusion d'offres d'emploi en Afrique de l'Ouest"),
     docs_url="/docs",
     redoc_url="/redoc",
     openapi_url="/openapi.json",

@@ -4,9 +4,8 @@ Service de gestion des entreprises.
 
 from slugify import slugify
 
-from app.core.supabase import supabase
 from app.core.logger import get_logger
-
+from app.core.supabase import supabase
 
 logger = get_logger(__name__)
 TABLE = "companies"
@@ -21,13 +20,7 @@ def get_or_create_company(nom: str, **extra) -> dict | None:
     nom = nom.strip()
     slug = slugify(nom)
 
-    existing = (
-        supabase.table(TABLE)
-        .select("*")
-        .eq("slug", slug)
-        .maybe_single()
-        .execute()
-    )
+    existing = supabase.table(TABLE).select("*").eq("slug", slug).maybe_single().execute()
 
     if existing and existing.data:
         return existing.data
@@ -44,14 +37,7 @@ def get_or_create_company(nom: str, **extra) -> dict | None:
 
 def get_companies(limit: int = 100) -> list[dict]:
     """Liste des entreprises."""
-    return (
-        supabase.table(TABLE)
-        .select("*")
-        .order("nom")
-        .limit(limit)
-        .execute()
-        .data or []
-    )
+    return supabase.table(TABLE).select("*").order("nom").limit(limit).execute().data or []
 
 
 def get_company(company_id: int) -> dict | None:

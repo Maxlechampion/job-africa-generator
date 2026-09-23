@@ -6,11 +6,9 @@ from fastapi import APIRouter
 
 from app.services.source_service import (
     create_source,
-    get_source,
     get_sources,
     update_source,
 )
-
 
 router = APIRouter(prefix="/admin/sources", tags=["admin-sources"])
 

@@ -49,11 +49,13 @@ class MyJobMagScraper(BaseScraper):
             if any(j["url"] == full_url for j in jobs):
                 continue
 
-            jobs.append(make_job(
-                titre=titre,
-                url=full_url,
-                source="MyJobMag",
-                pays="Nigeria",
-            ))
+            jobs.append(
+                make_job(
+                    titre=titre,
+                    url=full_url,
+                    source="MyJobMag",
+                    pays="Nigeria",
+                )
+            )
 
         return jobs

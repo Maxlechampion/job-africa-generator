@@ -4,20 +4,18 @@ Service d'envoi de notifications push.
 Base sur pywebpush.
 """
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
-from pywebpush import webpush, WebPushException
+from pywebpush import WebPushException, webpush
 
-from app.core.supabase import supabase
 from app.core.logger import get_logger
 from app.core.push import (
-    VAPID_PUBLIC_KEY,
-    VAPID_PRIVATE_KEY,
-    VAPID_SUBJECT,
     DEFAULT_TTL,
     DEFAULT_URGENCY,
+    VAPID_PRIVATE_KEY,
+    VAPID_SUBJECT,
 )
-
+from app.core.supabase import supabase
 
 logger = get_logger(__name__)
 
@@ -50,11 +48,7 @@ def save_subscription(
     }
 
     try:
-        r = (
-            supabase.table(TABLE)
-            .upsert(payload, on_conflict="endpoint")
-            .execute()
-        )
+        r = supabase.table(TABLE).upsert(payload, on_conflict="endpoint").execute()
         logger.info(f"Souscription push enregistree pour {user_id}")
         return r.data[0] if r.data else None
     except Exception as e:
@@ -76,12 +70,7 @@ def get_user_subscriptions(user_id: str) -> list[dict]:
     """Retourne toutes les souscriptions d'un utilisateur."""
 
     try:
-        r = (
-            supabase.table(TABLE)
-            .select("*")
-            .eq("user_id", user_id)
-            .execute()
-        )
+        r = supabase.table(TABLE).select("*").eq("user_id", user_id).execute()
         return r.data or []
     except Exception as e:
         logger.error(f"Erreur lecture souscriptions : {e}")
@@ -160,7 +149,7 @@ def send_push_to_user(
         "url": url or "https://frontend-zeta-six-12mzm0ovel.vercel.app/jobs",
         "icon": icon or "/icons/pwa-192x192.png",
         "tag": tag or "job-africa",
-        "timestamp": int(datetime.now(timezone.utc).timestamp() * 1000),
+        "timestamp": int(datetime.now(UTC).timestamp() * 1000),
     }
 
     sent = 0

@@ -9,9 +9,8 @@ from functools import lru_cache
 
 from gliner import GLiNER
 
+from app.core.ai_config import MAX_TEXT_LENGTH, NER_MODEL, SKILL_LABELS
 from app.core.logger import get_logger
-from app.core.ai_config import NER_MODEL, MAX_TEXT_LENGTH, SKILL_LABELS
-
 
 logger = get_logger(__name__)
 
@@ -91,12 +90,30 @@ def flatten_skills(skills: dict, text: str = None) -> list[str]:
 
     return flat
 
+
 # ==================== Filtre des faux positifs ====================
 
 FALSE_POSITIVES = {
-    "go", "rust", "word", "types", "react", "swift", "flutter",
-    "the", "a", "an", "is", "to", "of", "in", "and", "or",
-    "excel", "powerpoint", "outlook", "teams",
+    "go",
+    "rust",
+    "word",
+    "types",
+    "react",
+    "swift",
+    "flutter",
+    "the",
+    "a",
+    "an",
+    "is",
+    "to",
+    "of",
+    "in",
+    "and",
+    "or",
+    "excel",
+    "powerpoint",
+    "outlook",
+    "teams",
 }
 
 REQUIRES_CONTEXT = {

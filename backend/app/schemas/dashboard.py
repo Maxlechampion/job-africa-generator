@@ -2,7 +2,6 @@
 Schemas Pydantic pour le dashboard admin.
 """
 
-from typing import Optional
 from pydantic import BaseModel
 
 
@@ -24,7 +23,7 @@ class DailyCount(BaseModel):
 class TopItem(BaseModel):
     label: str
     total: int
-    extra: Optional[str] = None
+    extra: str | None = None
 
 
 class DashboardResponse(BaseModel):

@@ -13,11 +13,9 @@ Fonctions :
 import html
 import re
 from datetime import datetime
-from typing import Optional
 from urllib.parse import urlparse, urlunparse
 
 from slugify import slugify
-
 
 # ==================== Mapping pays ====================
 PAYS_AFRIQUE_OUEST = {
@@ -65,7 +63,7 @@ MOTS_ARTICLE = [
 
 
 # ==================== Nettoyage de texte ====================
-def clean_text(value: Optional[str]) -> Optional[str]:
+def clean_text(value: str | None) -> str | None:
     """
     Nettoie un texte :
     - décode les entités HTML (&#8217; → ', &nbsp; → ' ')
@@ -105,7 +103,7 @@ def clean_text(value: Optional[str]) -> Optional[str]:
 
 
 # ==================== Détection du pays ====================
-def detect_pays(text: Optional[str]) -> Optional[str]:
+def detect_pays(text: str | None) -> str | None:
     """
     Détecte le pays à partir d'un texte.
 
@@ -129,7 +127,7 @@ def detect_pays(text: Optional[str]) -> Optional[str]:
 
 
 # ==================== Normalisation d'URL ====================
-def normalize_url(url: Optional[str]) -> Optional[str]:
+def normalize_url(url: str | None) -> str | None:
     """
     Nettoie une URL :
     - retire les paramètres de tracking (utm_, fbclid, gclid)
@@ -156,21 +154,23 @@ def normalize_url(url: Optional[str]) -> Optional[str]:
                 if not part.startswith(("utm_", "fbclid", "gclid")):
                     query_parts.append(part)
 
-        return urlunparse((
-            parsed.scheme,
-            parsed.netloc.lower(),
-            parsed.path.rstrip("/"),
-            "",
-            "&".join(query_parts),
-            "",
-        ))
+        return urlunparse(
+            (
+                parsed.scheme,
+                parsed.netloc.lower(),
+                parsed.path.rstrip("/"),
+                "",
+                "&".join(query_parts),
+                "",
+            )
+        )
 
     except Exception:
         return url
 
 
 # ==================== Parsing de date ====================
-def parse_date(value) -> Optional[str]:
+def parse_date(value) -> str | None:
     """
     Convertit une date en ISO 8601.
 
@@ -196,6 +196,7 @@ def parse_date(value) -> Optional[str]:
         # Essaie le format RFC 2822 (utilisé par RSS)
         try:
             from email.utils import parsedate_to_datetime
+
             return parsedate_to_datetime(value).isoformat()
         except Exception:
             pass
@@ -256,7 +257,7 @@ def _truncate_description(description: str, max_length: int = 5000) -> str:
     last_period = truncated.rfind(".")
 
     if last_period > max_length * 0.7:
-        return truncated[:last_period + 1] + " [...]"
+        return truncated[: last_period + 1] + " [...]"
 
     return truncated + " [...]"
 

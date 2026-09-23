@@ -8,9 +8,8 @@ from functools import lru_cache
 
 from transformers import pipeline
 
-from app.core.logger import get_logger
 from app.core.ai_config import LANGUAGE_MODEL
-
+from app.core.logger import get_logger
 
 logger = get_logger(__name__)
 

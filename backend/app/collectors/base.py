@@ -49,8 +49,6 @@ class BaseCollector(ABC):
             Liste d'offres (dict)
         """
 
-        pass
-
     def safe_collect(self) -> list[dict]:
         """
         Wrapper avec gestion d'erreur.
@@ -68,15 +66,10 @@ class BaseCollector(ABC):
 
             self.jobs_collected = len(jobs)
 
-            self.logger.info(
-                f"Collecte terminée : {len(jobs)} offre(s) "
-                f"depuis {self.name}"
-            )
+            self.logger.info(f"Collecte terminée : {len(jobs)} offre(s) depuis {self.name}")
 
             return jobs
 
         except Exception as e:
-            self.logger.error(
-                f"Erreur de collecte depuis {self.name} : {e}"
-            )
+            self.logger.error(f"Erreur de collecte depuis {self.name} : {e}")
             return []

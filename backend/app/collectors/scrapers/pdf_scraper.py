@@ -13,7 +13,6 @@ import io
 
 from app.core.logger import get_logger
 
-
 logger = get_logger(__name__)
 
 
@@ -32,12 +31,10 @@ def extract_text(pdf_url_or_bytes) -> str:
     """
 
     try:
-        import pdfplumber
         import httpx
+        import pdfplumber
     except ImportError:
-        raise RuntimeError(
-            "pdfplumber non installe. Executez : pip install pdfplumber"
-        )
+        raise RuntimeError("pdfplumber non installe. Executez : pip install pdfplumber")
 
     # Recupere les bytes si c'est une URL
     if isinstance(pdf_url_or_bytes, str):

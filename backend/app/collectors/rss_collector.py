@@ -5,20 +5,16 @@ Utilise feedparser pour parser un flux RSS et extraire
 les offres d'emploi.
 """
 
-import httpx
 import feedparser
+import httpx
 
 from app.collectors.base import BaseCollector
 from app.services.normalizer import parse_date
 
-
 # ==================== Configuration ====================
-USER_AGENT = (
-    "Mozilla/5.0 (compatible; JobAfricaBot/1.0; "
-    "+https://job-africa.vercel.app)"
-)
+USER_AGENT = "Mozilla/5.0 (compatible; JobAfricaBot/1.0; +https://job-africa.vercel.app)"
 DEFAULT_TIMEOUT = 20  # Augmenté pour les serveurs lents
-MAX_ENTRIES = 100     # Limite pour éviter les flux énormes
+MAX_ENTRIES = 100  # Limite pour éviter les flux énormes
 
 
 class RSSCollector(BaseCollector):
@@ -61,12 +57,7 @@ class RSSCollector(BaseCollector):
         # ==================== Téléchargement ====================
         headers = {
             "User-Agent": USER_AGENT,
-            "Accept": (
-                "application/rss+xml, "
-                "application/atom+xml, "
-                "application/xml, "
-                "text/xml, */*"
-            ),
+            "Accept": ("application/rss+xml, application/atom+xml, application/xml, text/xml, */*"),
             "Accept-Language": "fr-FR,fr;q=0.9,en;q=0.8",
         }
 
@@ -82,29 +73,21 @@ class RSSCollector(BaseCollector):
 
         except httpx.HTTPStatusError as e:
             # Statut HTTP anormal (404, 410, 403, 500...)
-            raise RuntimeError(
-                f"HTTP {e.response.status_code} pour {self.feed_url}"
-            )
+            raise RuntimeError(f"HTTP {e.response.status_code} pour {self.feed_url}")
 
         except httpx.RequestError as e:
             # Erreur réseau (DNS, timeout, connexion...)
-            raise RuntimeError(
-                f"Erreur réseau : {type(e).__name__} — {e}"
-            )
+            raise RuntimeError(f"Erreur réseau : {type(e).__name__} — {e}")
 
         # ==================== Parsing ====================
         feed = feedparser.parse(content)
 
         # Vérifie que le flux est bien formé
         if feed.bozo and not feed.entries:
-            raise RuntimeError(
-                f"Flux RSS invalide : {self.feed_url}"
-            )
+            raise RuntimeError(f"Flux RSS invalide : {self.feed_url}")
 
         if not feed.entries:
-            self.logger.warning(
-                f"Aucune entrée dans le flux : {self.feed_url}"
-            )
+            self.logger.warning(f"Aucune entrée dans le flux : {self.feed_url}")
             return []
 
         # ==================== Extraction ====================
@@ -139,11 +122,7 @@ class RSSCollector(BaseCollector):
             return None
 
         # Description (parfois HTML)
-        description = (
-            entry.get("summary")
-            or entry.get("description")
-            or ""
-        )
+        description = entry.get("summary") or entry.get("description") or ""
 
         # Date de publication
         date_pub = entry.get("published") or entry.get("updated")

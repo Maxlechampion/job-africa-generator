@@ -6,13 +6,12 @@ Separe de collect.py pour ne pas impacter les collecteurs RSS existants.
 
 from fastapi import APIRouter
 
-from app.core.logger import get_logger
 from app.collectors.ats.sources import (
     ALL_ATS_SOURCES,
     get_ats_sources_summary,
 )
+from app.core.logger import get_logger
 from app.services.job_service import bulk_create_jobs
-
 
 logger = get_logger(__name__)
 
@@ -49,11 +48,13 @@ def collect_ats():
             collected = len(jobs)
 
             if collected == 0:
-                details.append({
-                    "source": collector.name,
-                    "status": "empty",
-                    "collected": 0,
-                })
+                details.append(
+                    {
+                        "source": collector.name,
+                        "status": "empty",
+                        "collected": 0,
+                    }
+                )
                 continue
 
             result = bulk_create_jobs(jobs)
@@ -65,26 +66,27 @@ def collect_ats():
             total_inserted += inserted
             total_skipped += skipped
 
-            details.append({
-                "source": collector.name,
-                "status": "success",
-                "collected": collected,
-                "inserted": inserted,
-                "skipped": skipped,
-            })
-
-            logger.info(
-                f"ATS {collector.name} : "
-                f"{collected} collectees, {inserted} inserees"
+            details.append(
+                {
+                    "source": collector.name,
+                    "status": "success",
+                    "collected": collected,
+                    "inserted": inserted,
+                    "skipped": skipped,
+                }
             )
+
+            logger.info(f"ATS {collector.name} : {collected} collectees, {inserted} inserees")
 
         except Exception as e:
             total_errors += 1
-            details.append({
-                "source": collector.name,
-                "status": "error",
-                "error": str(e)[:200],
-            })
+            details.append(
+                {
+                    "source": collector.name,
+                    "status": "error",
+                    "error": str(e)[:200],
+                }
+            )
             logger.error(f"ATS {collector.name} : {e}")
 
     return {

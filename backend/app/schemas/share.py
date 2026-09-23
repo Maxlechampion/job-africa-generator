@@ -3,7 +3,6 @@ Schemas Pydantic pour le partage social.
 """
 
 from datetime import datetime
-from typing import Optional
 
 from pydantic import BaseModel
 
@@ -11,7 +10,7 @@ from pydantic import BaseModel
 class ShareCreate(BaseModel):
     job_id: int
     canal: str  # whatsapp, linkedin, facebook, twitter, telegram, email, copy, native, other
-    referrer: Optional[str] = None
+    referrer: str | None = None
 
 
 class ShareStats(BaseModel):
@@ -21,7 +20,7 @@ class ShareStats(BaseModel):
     linkedin: int
     facebook: int
     copies: int
-    dernier_partage: Optional[datetime] = None
+    dernier_partage: datetime | None = None
 
 
 class ShareResponse(BaseModel):
@@ -33,6 +32,6 @@ class JobOGData(BaseModel):
     title: str
     description: str
     url: str
-    image: Optional[str] = None
+    image: str | None = None
     site_name: str = "Job Africa"
     locale: str = "fr_FR"

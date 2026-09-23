@@ -4,7 +4,6 @@ Configuration Web Push / VAPID.
 
 import os
 
-
 # ==================== VAPID ====================
 VAPID_PUBLIC_KEY = os.getenv(
     "VAPID_PUBLIC_KEY",

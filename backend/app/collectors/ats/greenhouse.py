@@ -37,9 +37,7 @@ class GreenhouseCollector(BaseATSCollector):
         self.name = source_name
         self.ats_type = "greenhouse"
 
-        self.api_url = (
-            f"https://boards-api.greenhouse.io/v1/boards/{token}/jobs"
-        )
+        self.api_url = f"https://boards-api.greenhouse.io/v1/boards/{token}/jobs"
 
     def collect(self) -> list[dict]:
         """Recupere les offres via l'API Greenhouse."""
@@ -83,8 +81,7 @@ class GreenhouseCollector(BaseATSCollector):
         if location_name:
             location_lower = location_name.lower()
             teletravail = any(
-                kw in location_lower
-                for kw in ["remote", "anywhere", "teletravail", "distanciel"]
+                kw in location_lower for kw in ["remote", "anywhere", "teletravail", "distanciel"]
             )
 
         updated = item.get("updated_at") or item.get("first_published")

@@ -14,7 +14,6 @@ from app.services.dashboard_service import (
     get_top_skills,
 )
 
-
 router = APIRouter(prefix="/admin/dashboard", tags=["admin-dashboard"])
 
 

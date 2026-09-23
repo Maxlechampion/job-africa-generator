@@ -12,7 +12,6 @@ from app.services.push_service import (
     send_push_to_user,
 )
 
-
 router = APIRouter(prefix="/push", tags=["push"])
 
 

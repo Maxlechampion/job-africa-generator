@@ -7,11 +7,10 @@ Fonctionnalites :
     - Enrichir les offres existantes (categorisation)
 """
 
-from app.core.supabase import supabase
 from app.core.logger import get_logger
-from app.services.deduplicator import is_duplicate
+from app.core.supabase import supabase
 from app.services.categorizer import enrich_job
-
+from app.services.deduplicator import is_duplicate
 
 logger = get_logger(__name__)
 
@@ -23,11 +22,7 @@ def fetch_all_jobs(limit: int = 5000) -> list[dict]:
 
     try:
         response = (
-            supabase.table(TABLE)
-            .select("*")
-            .order("created_at", desc=False)
-            .limit(limit)
-            .execute()
+            supabase.table(TABLE).select("*").order("created_at", desc=False).limit(limit).execute()
         )
         return response.data or []
 
@@ -69,10 +64,7 @@ def find_duplicates() -> list[tuple[int, int]]:
         if not is_dup:
             uniques.append(job)
 
-    logger.info(
-        f"{len(duplicates)} doublon(s) trouve(s) "
-        f"({len(uniques)} uniques sur {len(jobs)})"
-    )
+    logger.info(f"{len(duplicates)} doublon(s) trouve(s) ({len(uniques)} uniques sur {len(jobs)})")
 
     return duplicates
 
@@ -92,7 +84,7 @@ def delete_jobs_by_ids(job_ids: list[int]) -> int:
     batch_size = 50
 
     for i in range(0, len(job_ids), batch_size):
-        batch = job_ids[i:i + batch_size]
+        batch = job_ids[i : i + batch_size]
 
         try:
             # Supabase retourne les lignes supprimées avec .select() après delete

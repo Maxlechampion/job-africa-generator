@@ -7,7 +7,6 @@ Certains tournent sur CPU, d'autres sont quantifies 4-bit.
 
 import os
 
-
 # ==================== Cache local ====================
 HF_HOME = os.path.join(os.getcwd(), ".hf_cache")
 os.environ.setdefault("HF_HOME", HF_HOME)

@@ -27,7 +27,6 @@ class BaseAPICollector(ABC):
     @abstractmethod
     def collect(self) -> list[dict]:
         """Recupere les offres depuis l'API."""
-        pass
 
     def safe_collect(self) -> list[dict]:
         """Wrapper avec gestion d'erreur."""
