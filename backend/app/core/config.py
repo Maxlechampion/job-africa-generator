@@ -20,6 +20,7 @@ class Settings(BaseSettings):
     # ==================== SUPABASE ====================
     SUPABASE_URL: str
     SUPABASE_KEY: str
+    SUPABASE_SERVICE_KEY: str ="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdxcW1obHd0dnRpeGF5eXN0c3l3Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4OTY1ODY5OSwiZXhwIjoyMTA1MjM0Njk5fQ.6QVdYIDpoPZ4jGdmjYitABeAGhKvyrab8-3lniunARw"
 
     # ==================== APP ====================
     APP_NAME: str = "Job Africa API"

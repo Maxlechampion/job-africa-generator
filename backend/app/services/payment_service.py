@@ -3,7 +3,7 @@ Service de paiement abstrait.
 """
 
 import uuid
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timezone 
 
 from app.core.logger import get_logger
 from app.core.payments import PAYMENT_PROVIDER, TARIFS
@@ -71,19 +71,42 @@ def create_transaction(
 def confirm_transaction(
     reference: str,
     provider_transaction_id: str | None = None,
+    use_admin: bool = False,
 ) -> dict | None:
-    """Marque une transaction comme payee."""
+    """
+    Marque une transaction comme payee.
+
+    Args:
+        reference: Reference unique de la transaction
+        provider_transaction_id: ID du provider (optionnel)
+        use_admin: Si True, utilise le client service_role (bypass RLS)
+    """
+
+    # Choisit le client
+    if use_admin:
+        from app.core.supabase_admin import get_admin_client
+        client = get_admin_client()
+        if not client:
+            logger.error("Client admin indisponible")
+            return None
+    else:
+        client = supabase
 
     try:
         payload = {
             "statut": "paid",
-            "paid_at": datetime.now(UTC).isoformat(),
+            "paid_at": datetime.now(timezone.utc).isoformat(),
         }
 
         if provider_transaction_id:
             payload["provider_transaction_id"] = provider_transaction_id
 
-        r = supabase.table(TABLE).update(payload).eq("reference", reference).execute()
+        r = (
+            client.table(TABLE)
+            .update(payload)
+            .eq("reference", reference)
+            .execute()
+        )
 
         transaction = r.data[0] if r.data else None
 
