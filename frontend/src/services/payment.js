@@ -6,19 +6,15 @@ const baseURL = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
 const api = axios.create({ baseURL, timeout: 30000 });
 
 // ==================== INTERCEPTEUR AUTH ====================
-// Récupère le token depuis Supabase (pas localStorage)
 api.interceptors.request.use(async (config) => {
   try {
     const { data: { session } } = await supabase.auth.getSession();
 
     if (session?.access_token) {
       config.headers.Authorization = `Bearer ${session.access_token}`;
-      console.log("[PAYMENT] ✅ Token ajouté");
-    } else {
-      console.warn("[PAYMENT] ⚠️ Aucune session active");
     }
   } catch (e) {
-    console.warn("[PAYMENT] ❌ Erreur session :", e);
+    console.warn("[PAYMENT] Erreur session :", e);
   }
 
   return config;
@@ -37,10 +33,16 @@ api.interceptors.response.use(
 
 // ==================== API ====================
 export default {
-  getTarifs: () => api.get("/payments/tarifs").then((r) => r.data),
+  getTarifs: () =>
+    api.get("/payments/tarifs").then((r) => r.data),
 
   initiate: (type, metadata = {}) =>
-    api.post("/payments/initiate", { type, metadata }).then((r) => r.data),
+    api
+      .post("/payments/initiate", { type, metadata })
+      .then((r) => {
+        console.log("[PAYMENT] Réponse initiate :", r.data);
+        return r.data;
+      }),
 
   getTransactions: () =>
     api.get("/payments/transactions").then((r) => r.data),

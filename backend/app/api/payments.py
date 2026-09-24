@@ -8,7 +8,13 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
 from app.core.auth import get_current_user
-from app.core.payments import TARIFS, MOYENS_PAR_PAYS, PAYMENT_PROVIDER
+from app.core.payments import (
+    TARIFS,
+    MOYENS_PAR_PAYS,
+    PAYMENT_PROVIDER,
+    KKIAPAY_PUBLIC_KEY,
+    KKIAPAY_SANDBOX,
+)
 from app.services.payment_service import (
     create_transaction,
     get_user_transactions,
@@ -42,12 +48,13 @@ def initiate_payment(
     """
     Cree une transaction en attente.
 
-    Utilise use_admin=True pour bypasser RLS.
+    Retourne les infos pour ouvrir le widget KKiaPay.
     """
 
     if payload.type not in TARIFS:
         raise HTTPException(400, f"Type de paiement inconnu : {payload.type}")
 
+    # Cree la transaction
     transaction = create_transaction(
         user_id=user["id"],
         type=payload.type,
@@ -58,12 +65,22 @@ def initiate_payment(
     if not transaction:
         raise HTTPException(500, "Impossible de creer la transaction")
 
+    # Retourne les infos du widget
     return {
         "reference": transaction["reference"],
         "montant": transaction["montant"],
         "devise": transaction["devise"],
         "provider": transaction["provider"],
         "statut": transaction["statut"],
+
+        # Infos KKiaPay
+        "kkiapay": {
+            "public_key": KKIAPAY_PUBLIC_KEY,
+            "sandbox": KKIAPAY_SANDBOX,
+            "amount": transaction["montant"],
+            "currency": transaction["devise"],
+            "reference": transaction["reference"],
+        },
     }
 
 

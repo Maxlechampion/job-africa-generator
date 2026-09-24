@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted } from "vue";
+import { onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
 import { storeToRefs } from "pinia";
 
@@ -8,6 +8,7 @@ import BaseButton from "@/components/ui/BaseButton.vue";
 import BaseSpinner from "@/components/ui/BaseSpinner.vue";
 import EmptyState from "@/components/ui/EmptyState.vue";
 import ShareButton from "@/components/jobs/ShareButton.vue";
+import BoostButton from "@/components/jobs/BoostButton.vue";
 
 import { useJobsStore } from "@/stores/jobs";
 import { formatDate, timeAgo, countryFlag } from "@/utils/format";
@@ -23,8 +24,6 @@ onMounted(() => {
 function apply() {
   if (job.value?.url) window.open(job.value.url, "_blank");
 }
-
-import BoostButton from "@/components/jobs/BoostButton.vue";
 </script>
 
 <template>
@@ -86,7 +85,7 @@ import BoostButton from "@/components/jobs/BoostButton.vue";
         </div>
       </div>
 
-      <!-- Sidebar (passe en bas sur mobile) -->
+      <!-- Sidebar -->
       <aside class="space-y-3 sm:space-y-4 sidebar-sticky">
         <div class="card">
           <BaseButton size="lg" class="w-full" @click="apply">
@@ -96,9 +95,10 @@ import BoostButton from "@/components/jobs/BoostButton.vue";
           <div class="mt-3">
             <ShareButton :job="job" />
           </div>
+
           <div class="mt-3">
-  <BoostButton :job="job" variant="button" />
-</div>
+            <BoostButton :job="job" variant="button" />
+          </div>
 
           <div class="mt-4 space-y-3 text-sm">
             <div class="flex justify-between gap-2">
