@@ -3,6 +3,7 @@ import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
 import paymentApi from "@/services/payment";
+import { useToastStore } from "@/stores/toast";
 import BaseButton from "@/components/ui/BaseButton.vue";
 
 const props = defineProps({
@@ -14,6 +15,7 @@ const emit = defineEmits(["boosted"]);
 
 const router = useRouter();
 const auth = useAuthStore();
+const toast = useToastStore();
 
 const loading = ref(false);
 const success = ref(false);
@@ -44,18 +46,16 @@ async function handleBoost() {
         "Montant : " + result.montant + " FCFA\n\n" +
         "Votre offre sera boostee des confirmation du paiement.";
 
-      alert(message);
+      toast.payment(result.reference, result.montant, result.devise);
 
       emit("boosted", result);
 
-      setTimeout(function () {
-        window.location.reload();
-      }, 1000);
+      
     }
   } catch (e) {
     console.error("Erreur boost :", e);
     error.value = "Erreur lors de la creation de la transaction";
-    alert(error.value);
+    toast.error("Erreur", error.value);
   } finally {
     loading.value = false;
   }
