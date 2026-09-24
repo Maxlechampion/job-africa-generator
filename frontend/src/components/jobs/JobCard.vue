@@ -5,6 +5,8 @@ import { timeAgo, truncate, countryFlag } from "@/utils/format";
 defineProps({
   job: { type: Object, required: true },
 });
+
+import BoostButton from "./BoostButton.vue";
 </script>
 
 <template>
@@ -57,5 +59,8 @@ defineProps({
       <span class="truncate">📅 {{ timeAgo(job.date_publication || job.created_at) }}</span>
       <span class="truncate ml-2">🔗 {{ job.source }}</span>
     </div>
-  </RouterLink>
+    <div class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
+    <BoostButton :job="job" variant="icon" />
+  </div>
+</RouterLink>
 </template>

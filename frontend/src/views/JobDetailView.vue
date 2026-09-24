@@ -23,6 +23,8 @@ onMounted(() => {
 function apply() {
   if (job.value?.url) window.open(job.value.url, "_blank");
 }
+
+import BoostButton from "@/components/jobs/BoostButton.vue";
 </script>
 
 <template>
@@ -94,6 +96,9 @@ function apply() {
           <div class="mt-3">
             <ShareButton :job="job" />
           </div>
+          <div class="mt-3">
+  <BoostButton :job="job" variant="button" />
+</div>
 
           <div class="mt-4 space-y-3 text-sm">
             <div class="flex justify-between gap-2">
