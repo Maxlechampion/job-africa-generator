@@ -25,21 +25,28 @@ def list_tarifs():
     }
 
 
+from pydantic import BaseModel
+from typing import Optional
+
+
+class InitiatePaymentRequest(BaseModel):
+    type: str
+    metadata: Optional[dict] = None
+
+
 @router.post("/initiate")
 def initiate_payment(
-    type: str,
-    metadata: dict | None = None,
+    payload: InitiatePaymentRequest,
     user=Depends(get_current_user),
 ):
     """Cree une transaction en attente."""
-
-    if type not in TARIFS:
-        raise HTTPException(400, f"Type de paiement inconnu : {type}")
+    if payload.type not in TARIFS:
+        raise HTTPException(400, f"Type de paiement inconnu : {payload.type}")
 
     transaction = create_transaction(
         user_id=user["id"],
-        type=type,
-        metadata=metadata or {},
+        type=payload.type,
+        metadata=payload.metadata or {},
     )
 
     if not transaction:
@@ -52,7 +59,6 @@ def initiate_payment(
         "provider": transaction["provider"],
         "statut": transaction["statut"],
     }
-
 
 @router.get("/transactions")
 def my_transactions(user=Depends(get_current_user)):
