@@ -10,27 +10,28 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api import (
-    admin,
-    admin_dedup,
-    admin_sources,
-    ai,
-    alerts,
-    auth,
+    jobs,
+    stats,
     collect,
-    collect_api,
+    admin,
     collect_ats,
     collect_scrapers,
+    collect_api,
+    admin_dedup,
     companies,
-    dashboard,
+    skills,
     favorites,
-    jobs,
+    alerts,
+    admin_sources,
+    ai,
+    dashboard,
+    auth,
+    share,
+    push,
     payments,
     premium,
-    push,
-    share,
-    skills,
     sponsored,
-    stats,
+    webhooks,
 )
 from app.core.config import settings
 from app.core.logger import get_logger
@@ -116,6 +117,7 @@ app.include_router(push.router)
 app.include_router(payments.router)
 app.include_router(premium.router)
 app.include_router(sponsored.router)
+app.include_router(webhooks.router)
 
 
 # ==================== Root ====================

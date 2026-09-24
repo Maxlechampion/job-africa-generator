@@ -4,29 +4,38 @@ Configuration des agregateurs de paiement pour l'Afrique de l'Ouest.
 
 import os
 
+
 # ==================== Agregateur actif ====================
-PAYMENT_PROVIDER = os.getenv("PAYMENT_PROVIDER", "manual")
+PAYMENT_PROVIDER = os.getenv("PAYMENT_PROVIDER", "kkiapay")
 
 
 # ==================== KKiaPay ====================
-KKIAPAY_PUBLIC_KEY = os.getenv("KKIAPAY_PUBLIC_KEY", "")
-KKIAPAY_PRIVATE_KEY = os.getenv("KKIAPAY_PRIVATE_KEY", "")
-KKIAPAY_SECRET = os.getenv("KKIAPAY_SECRET", "")
+KKIAPAY_PUBLIC_KEY = os.getenv(
+    "KKIAPAY_PUBLIC_KEY",
+    "832a1e38086dd4c4e3dc0fe21b0d9d37a6dbabd0",
+)
+
+KKIAPAY_PRIVATE_KEY = os.getenv(
+    "KKIAPAY_PRIVATE_KEY",
+    "pk_44447240141f408206f9d2653e7a80d2d3db48a282d3f2a99814d34fb3d40a33",
+)
+
+KKIAPAY_SECRET = os.getenv(
+    "KKIAPAY_SECRET",
+    "sk_c9d670d6db44df1f95517fdf18985860c8eb22e7fae391a161e2edc53b0502ce",
+)
+
+KKIAPAY_SANDBOX = os.getenv("KKIAPAY_SANDBOX", "true").lower() == "true"
 
 
-# ==================== FedaPay ====================
+# ==================== FedaPay (backup) ====================
 FEDAPAY_SECRET_KEY = os.getenv("FEDAPAY_SECRET_KEY", "")
 FEDAPAY_PUBLIC_KEY = os.getenv("FEDAPAY_PUBLIC_KEY", "")
 
 
-# ==================== Paystack ====================
+# ==================== Paystack (backup) ====================
 PAYSTACK_SECRET_KEY = os.getenv("PAYSTACK_SECRET_KEY", "")
 PAYSTACK_PUBLIC_KEY = os.getenv("PAYSTACK_PUBLIC_KEY", "")
-
-
-# ==================== Flutterwave ====================
-FLUTTERWAVE_SECRET_KEY = os.getenv("FLUTTERWAVE_SECRET_KEY", "")
-FLUTTERWAVE_PUBLIC_KEY = os.getenv("FLUTTERWAVE_PUBLIC_KEY", "")
 
 
 # ==================== Tarifs ====================
