@@ -3,11 +3,12 @@ Service de paiement abstrait.
 """
 
 import uuid
-from datetime import UTC, datetime, timezone 
+from datetime import datetime, timezone
 
+from app.core.supabase import supabase
 from app.core.logger import get_logger
 from app.core.payments import PAYMENT_PROVIDER, TARIFS
-from app.core.supabase import supabase
+
 
 logger = get_logger(__name__)
 
@@ -28,24 +29,44 @@ def create_transaction(
     company_id: int | None = None,
     provider: str | None = None,
     metadata: dict | None = None,
-    access_token: str | None = None,  # ← NOUVEAU
+    access_token: str | None = None,
+    use_admin: bool = False,
 ) -> dict:
-    """Cree une transaction en base."""
+    """
+    Cree une transaction en base.
 
-    # Choisit le client (authentifié si token fourni)
-    if access_token:
+    Args:
+        user_id: ID de l'utilisateur (ou None)
+        type: Type de transaction (premium_job, etc.)
+        montant: Montant en FCFA (sinon lu depuis TARIFS)
+        company_id: ID de l'entreprise (optionnel)
+        provider: Provider de paiement (optionnel)
+        metadata: Metadata JSON (ex: {"job_id": 1})
+        access_token: JWT utilisateur (pour client authentifie)
+        use_admin: Si True, utilise le client service_role (bypass RLS)
+    """
+
+    # ==================== CHOIX DU CLIENT ====================
+    if use_admin:
+        from app.core.supabase_admin import get_admin_client
+        client = get_admin_client()
+        if not client:
+            logger.error("Client admin indisponible — fallback sur client anon")
+            client = supabase
+    elif access_token:
         from app.core.supabase import get_authenticated_client
         client = get_authenticated_client(access_token)
     else:
         client = supabase
 
-    # ... reste du code (utilise "client" au lieu de "supabase")
+    # ==================== MONTANT ====================
     if montant is None:
         tarif = TARIFS.get(type, {})
         montant = tarif.get("prix", 0)
 
     reference = generate_reference()
 
+    # ==================== PAYLOAD ====================
     payload = {
         "user_id": user_id,
         "company_id": company_id,
@@ -75,14 +96,8 @@ def confirm_transaction(
 ) -> dict | None:
     """
     Marque une transaction comme payee.
-
-    Args:
-        reference: Reference unique de la transaction
-        provider_transaction_id: ID du provider (optionnel)
-        use_admin: Si True, utilise le client service_role (bypass RLS)
     """
 
-    # Choisit le client
     if use_admin:
         from app.core.supabase_admin import get_admin_client
         client = get_admin_client()
@@ -131,29 +146,24 @@ def _apply_benefits(transaction: dict):
             job_id = metadata.get("job_id")
             if job_id:
                 from app.services.premium_service import activate_premium
-
                 activate_premium(job_id, transaction["user_id"])
 
         elif type_tx == "sponsored_job":
             job_id = metadata.get("job_id")
             if job_id:
                 from app.services.sponsored_service import activate_sponsored
-
                 activate_sponsored(job_id, transaction.get("company_id"))
 
         elif type_tx == "subscription_premium":
             from app.services.premium_service import activate_subscription
-
             activate_subscription(transaction["user_id"], "premium")
 
         elif type_tx == "subscription_pro":
             from app.services.premium_service import activate_subscription
-
             activate_subscription(transaction["user_id"], "pro")
 
         elif type_tx == "banner_week":
             from app.services.sponsored_service import activate_banner
-
             banner_id = metadata.get("banner_id")
             if banner_id:
                 activate_banner(banner_id)
@@ -182,7 +192,12 @@ def get_revenue_stats() -> dict:
     """Statistiques de revenus (admin)."""
 
     try:
-        r = supabase.table(TABLE).select("montant, type, statut").eq("statut", "paid").execute()
+        r = (
+            supabase.table(TABLE)
+            .select("montant, type, statut")
+            .eq("statut", "paid")
+            .execute()
+        )
 
         rows = r.data or []
         total = sum(row.get("montant", 0) for row in rows)

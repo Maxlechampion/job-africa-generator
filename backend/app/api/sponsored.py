@@ -11,6 +11,7 @@ from app.services.sponsored_service import (
     get_active_banners,
 )
 
+
 router = APIRouter(prefix="/sponsored", tags=["sponsored"])
 
 
@@ -50,6 +51,7 @@ def create_banner_endpoint(
         type="banner_week",
         company_id=company_id,
         metadata={"banner_id": banner["id"]},
+        use_admin=True,
     )
 
     return {"banner": banner, "transaction": transaction}
@@ -68,6 +70,7 @@ def sponsor_job(
         company_id=company_id,
         type="sponsored_job",
         metadata={"job_id": job_id},
+        use_admin=True,
     )
 
     if not transaction:

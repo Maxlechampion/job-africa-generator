@@ -1,6 +1,10 @@
+"""
+Routes API pour les paiements.
+"""
+
 from typing import Optional
 
-from fastapi import APIRouter, Depends, Header, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
 from app.core.auth import get_current_user
@@ -20,20 +24,26 @@ class InitiatePaymentRequest(BaseModel):
     metadata: Optional[dict] = None
 
 
-def get_access_token(authorization: str = Header(...)) -> str:
-    """Extrait le token Bearer du header Authorization."""
-    if not authorization.startswith("Bearer "):
-        raise HTTPException(401, "Format de token invalide")
-    return authorization[7:]  # Enlève "Bearer "
+@router.get("/tarifs")
+def list_tarifs():
+    """Liste des tarifs disponibles."""
+    return {
+        "provider": PAYMENT_PROVIDER,
+        "tarifs": TARIFS,
+        "moyens_par_pays": MOYENS_PAR_PAYS,
+    }
 
 
 @router.post("/initiate")
 def initiate_payment(
     payload: InitiatePaymentRequest,
     user=Depends(get_current_user),
-    token: str = Depends(get_access_token),
 ):
-    """Cree une transaction en attente."""
+    """
+    Cree une transaction en attente.
+
+    Utilise use_admin=True pour bypasser RLS.
+    """
 
     if payload.type not in TARIFS:
         raise HTTPException(400, f"Type de paiement inconnu : {payload.type}")
@@ -42,7 +52,7 @@ def initiate_payment(
         user_id=user["id"],
         type=payload.type,
         metadata=payload.metadata or {},
-        access_token=token,  # ← Passe le token
+        use_admin=True,
     )
 
     if not transaction:
@@ -55,3 +65,17 @@ def initiate_payment(
         "provider": transaction["provider"],
         "statut": transaction["statut"],
     }
+
+
+@router.get("/transactions")
+def my_transactions(user=Depends(get_current_user)):
+    """Liste des transactions de l'utilisateur."""
+    return get_user_transactions(user["id"])
+
+
+@router.get("/admin/revenue")
+def revenue(user=Depends(get_current_user)):
+    """Statistiques de revenus (admin uniquement)."""
+    if user.get("user_role") != "admin":
+        raise HTTPException(403, "Admin requis")
+    return get_revenue_stats()
