@@ -30,3 +30,33 @@ def _create_supabase_client() -> Client:
 
 # ==================== Client global ====================
 supabase: Client = _create_supabase_client()
+
+
+logger = get_logger(__name__)
+
+
+# ==================== Client global (anon) ====================
+supabase: Client = create_client(
+    settings.SUPABASE_URL,
+    settings.SUPABASE_KEY,
+)
+
+
+# ==================== Client authentifié (pour RLS) ====================
+def get_authenticated_client(access_token: str) -> Client:
+    """
+    Crée un client Supabase avec le JWT de l'utilisateur.
+
+    Ce client hérite des droits RLS de l'utilisateur :
+    - auth.uid() retourne l'ID de l'utilisateur
+    - Les politiques RLS basées sur auth.uid() fonctionnent
+    """
+    client = create_client(
+        settings.SUPABASE_URL,
+        settings.SUPABASE_KEY,
+    )
+
+    # Injecte le JWT utilisateur
+    client.postgrest.auth(access_token)
+
+    return client

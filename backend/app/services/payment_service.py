@@ -28,9 +28,18 @@ def create_transaction(
     company_id: int | None = None,
     provider: str | None = None,
     metadata: dict | None = None,
+    access_token: str | None = None,  # ← NOUVEAU
 ) -> dict:
     """Cree une transaction en base."""
 
+    # Choisit le client (authentifié si token fourni)
+    if access_token:
+        from app.core.supabase import get_authenticated_client
+        client = get_authenticated_client(access_token)
+    else:
+        client = supabase
+
+    # ... reste du code (utilise "client" au lieu de "supabase")
     if montant is None:
         tarif = TARIFS.get(type, {})
         montant = tarif.get("prix", 0)
@@ -50,7 +59,7 @@ def create_transaction(
     }
 
     try:
-        r = supabase.table(TABLE).insert(payload).execute()
+        r = client.table(TABLE).insert(payload).execute()
         transaction = r.data[0] if r.data else {}
         logger.info(f"Transaction creee : {reference} - {montant} FCFA")
         return transaction

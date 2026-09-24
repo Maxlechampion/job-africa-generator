@@ -1,32 +1,18 @@
-"""
-Routes API pour les paiements.
-"""
+from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, Header, HTTPException
+from pydantic import BaseModel
 
 from app.core.auth import get_current_user
-from app.core.payments import MOYENS_PAR_PAYS, PAYMENT_PROVIDER, TARIFS
+from app.core.payments import TARIFS, MOYENS_PAR_PAYS, PAYMENT_PROVIDER
 from app.services.payment_service import (
     create_transaction,
-    get_revenue_stats,
     get_user_transactions,
+    get_revenue_stats,
 )
 
+
 router = APIRouter(prefix="/payments", tags=["payments"])
-
-
-@router.get("/tarifs")
-def list_tarifs():
-    """Liste des tarifs disponibles."""
-    return {
-        "provider": PAYMENT_PROVIDER,
-        "tarifs": TARIFS,
-        "moyens_par_pays": MOYENS_PAR_PAYS,
-    }
-
-
-from pydantic import BaseModel
-from typing import Optional
 
 
 class InitiatePaymentRequest(BaseModel):
@@ -34,12 +20,21 @@ class InitiatePaymentRequest(BaseModel):
     metadata: Optional[dict] = None
 
 
+def get_access_token(authorization: str = Header(...)) -> str:
+    """Extrait le token Bearer du header Authorization."""
+    if not authorization.startswith("Bearer "):
+        raise HTTPException(401, "Format de token invalide")
+    return authorization[7:]  # Enlève "Bearer "
+
+
 @router.post("/initiate")
 def initiate_payment(
     payload: InitiatePaymentRequest,
     user=Depends(get_current_user),
+    token: str = Depends(get_access_token),
 ):
     """Cree une transaction en attente."""
+
     if payload.type not in TARIFS:
         raise HTTPException(400, f"Type de paiement inconnu : {payload.type}")
 
@@ -47,6 +42,7 @@ def initiate_payment(
         user_id=user["id"],
         type=payload.type,
         metadata=payload.metadata or {},
+        access_token=token,  # ← Passe le token
     )
 
     if not transaction:
@@ -59,14 +55,3 @@ def initiate_payment(
         "provider": transaction["provider"],
         "statut": transaction["statut"],
     }
-
-@router.get("/transactions")
-def my_transactions(user=Depends(get_current_user)):
-    return get_user_transactions(user["id"])
-
-
-@router.get("/admin/revenue")
-def revenue(user=Depends(get_current_user)):
-    if user.get("user_role") != "admin":
-        raise HTTPException(403, "Admin requis")
-    return get_revenue_stats()
