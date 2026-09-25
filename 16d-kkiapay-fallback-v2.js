@@ -1,4 +1,32 @@
-<script setup>
+#!/usr/bin/env node
+
+import fs from "fs";
+import path from "path";
+
+import { exists, writeFiles, removeFile, ROOT } from "./_lib/fs-utils.js";
+import { log } from "./_lib/logger.js";
+import { markInstalled, markUninstalled, isInstalled } from "./_lib/registry.js";
+import { validateRequirements } from "./_lib/validator.js";
+
+const args = process.argv.slice(2);
+const OPTIONS = {
+  force: args.includes("--force"),
+  dryRun: args.includes("--dry-run"),
+  uninstall: args.includes("--uninstall"),
+  verbose: args.includes("--verbose"),
+};
+
+const MODULE_ID = "16d";
+const MODULE_NAME = "Fallback KKiaPay v2";
+const MODULE_VERSION = "1.0.0";
+
+const REQUIREMENTS = [
+  "frontend/src/components/jobs/BoostButton.vue",
+];
+
+// ==================== BoostButton.vue (fallback intelligent) ====================
+
+const BOOST_BUTTON = `<script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
@@ -226,3 +254,73 @@ async function handleBoost() {
     </div>
   </div>
 </template>
+`;
+
+const FILES = {
+  "frontend/src/components/jobs/BoostButton.vue": BOOST_BUTTON,
+};
+
+async function main() {
+  log.banner("MODULE 16d — FALLBACK KKIAPAY v2");
+
+  if (!OPTIONS.uninstall && !validateRequirements(REQUIREMENTS, MODULE_NAME)) {
+    process.exit(1);
+  }
+
+  if (!OPTIONS.uninstall && isInstalled(MODULE_ID) && !OPTIONS.force) {
+    log.warn("Module deja installe.");
+    process.exit(0);
+  }
+
+  if (OPTIONS.uninstall) {
+    log.info("Ce module ne fait que modifier BoostButton.vue.");
+    if (!OPTIONS.dryRun) markUninstalled(MODULE_ID);
+    return;
+  }
+
+  log.section("Modification de BoostButton.vue");
+
+  const results = writeFiles(FILES, {
+    overwrite: true,
+    dryRun: OPTIONS.dryRun,
+    backup: true,
+  });
+
+  for (const d of results.details) {
+    log.file(d.path, d.status);
+  }
+
+  log.info(
+    "-> " + results.created + " cree(s), " + results.overwritten + " ecrase(s)"
+  );
+
+  if (!OPTIONS.dryRun) {
+    markInstalled(MODULE_ID, {
+      version: MODULE_VERSION,
+      files: Object.keys(FILES),
+      filesOverwritten: results.overwritten,
+      note: "Fallback intelligent : detection widget dans le DOM",
+    });
+  }
+
+  log.banner("MODULE 16d — TERMINE");
+
+  console.log("");
+  console.log("  Ameliorations :");
+  console.log("  - Attente 5 secondes apres openKkiapayWidget");
+  console.log("  - Detection du widget dans le DOM");
+  console.log("  - Detection des erreurs KKiaPay");
+  console.log("  - Fallback automatique si widget absent");
+  console.log("");
+  console.log("  Prochaines etapes :");
+  console.log("  1. Relancer le frontend (npm run dev)");
+  console.log("  2. Tester : cliquer 'Booster cette offre'");
+  console.log("  3. Le fallback s'active automatiquement");
+  console.log("");
+}
+
+main().catch((e) => {
+  log.error(e.message);
+  if (OPTIONS.verbose) console.error(e.stack);
+  process.exit(1);
+});

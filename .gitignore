@@ -95,3 +95,7 @@ lerna-debug.log*
 *.pem
 *.key
 secrets/
+
+# Dossier de stockage local des scripts JS
+fichierjs/
+scripts.purge_database

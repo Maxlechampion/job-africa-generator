@@ -1,4 +1,51 @@
-"""
+#!/usr/bin/env node
+
+/**
+ * ═══════════════════════════════════════════════════════════════
+ *  MODULE 17b — INTÉGRATION DU FILTRE DE PERTINENCE
+ * ═══════════════════════════════════════════════════════════════
+ *
+ * Intègre le filtre de pertinence dans job_service.py :
+ *   - Filtre les articles de blog avant insertion
+ *   - Log les statistiques (gardées / rejetées)
+ *
+ * FICHIERS MODIFIÉS (1) :
+ *   backend/app/services/job_service.py
+ *
+ * USAGE :
+ *   node 17b-integrate-filter.js [options]
+ *
+ * ═══════════════════════════════════════════════════════════════
+ */
+
+import fs from "fs";
+import path from "path";
+
+import { exists, writeFiles, removeFile, ROOT } from "./_lib/fs-utils.js";
+import { log } from "./_lib/logger.js";
+import { markInstalled, markUninstalled, isInstalled } from "./_lib/registry.js";
+import { validateRequirements } from "./_lib/validator.js";
+
+const args = process.argv.slice(2);
+const OPTIONS = {
+  force: args.includes("--force"),
+  dryRun: args.includes("--dry-run"),
+  uninstall: args.includes("--uninstall"),
+  verbose: args.includes("--verbose"),
+};
+
+const MODULE_ID = "17b";
+const MODULE_NAME = "Intégration filtre";
+const MODULE_VERSION = "1.0.0";
+
+const REQUIREMENTS = [
+  "backend/app/services/job_service.py",
+  "backend/app/services/relevance_filter.py",
+];
+
+// ==================== job_service.py (complet avec filtre) ====================
+
+const JOB_SERVICE = `"""
 Service de gestion des offres d'emploi.
 
 CRUD + recherche + statistiques.
@@ -19,7 +66,11 @@ TABLE = "jobs"
 
 # ==================== CREATION ====================
 def create_job(job: dict) -> list[dict]:
-    """Insere ou met a jour une offre."""
+    """
+    Insere ou met a jour une offre.
+
+    Utilise upsert sur l'URL pour eviter les doublons.
+    """
 
     normalized = normalize_job(job)
 
@@ -40,11 +91,10 @@ def bulk_create_jobs(jobs: list[dict]) -> dict:
     """
     Insere un lot d'offres.
 
-    ORDRE CORRECT :
-        1. Normalisation (decoder HTML, nettoyer)
-        2. Filtre de pertinence (detecter blogs, actualites)
-        3. Deduplication interne
-        4. Insertion
+    Filtre les articles de blog avant insertion.
+
+    Returns:
+        {inserted: int, skipped: int}
     """
 
     if not jobs:
@@ -52,13 +102,8 @@ def bulk_create_jobs(jobs: list[dict]) -> dict:
 
     total_recu = len(jobs)
 
-    # ==================== 1. NORMALISATION ====================
-    # Important : normaliser AVANT le filtre pour que les entites HTML
-    # soient decodees (&#xe9; → é) et que le filtre detecte les mots
-    normalized = [normalize_job(j) for j in jobs]
-
-    # ==================== 2. FILTRE DE PERTINENCE ====================
-    jobs_filtered, filter_stats = filter_relevant_jobs(normalized)
+    # ==================== FILTRE DE PERTINENCE ====================
+    jobs_filtered, filter_stats = filter_relevant_jobs(jobs)
 
     logger.info(
         f"Filtre pertinence : {filter_stats['kept']} gardees, "
@@ -72,37 +117,23 @@ def bulk_create_jobs(jobs: list[dict]) -> dict:
         logger.warning("Aucune offre pertinente dans ce lot")
         return {"inserted": 0, "skipped": total_recu}
 
-    # ==================== 3. DEDUPLICATION INTERNE ====================
-    seen_urls = set()
-    deduped = []
+    # ==================== NORMALISATION ====================
+    normalized = [normalize_job(j) for j in jobs_filtered]
 
-    for job in jobs_filtered:
-        url = job.get("url")
-        if not url:
-            continue
-        if url in seen_urls:
-            continue
-        seen_urls.add(url)
-        deduped.append(job)
+    # Filtre les offres sans URL
+    valides = [j for j in normalized if j.get("url")]
 
-    doublons_internes = len(jobs_filtered) - len(deduped)
+    skipped = total_recu - len(valides)
 
-    if doublons_internes > 0:
-        logger.info(
-            f"Deduplication interne : {doublons_internes} doublons supprimes"
-        )
-
-    skipped = total_recu - len(deduped)
-
-    if not deduped:
+    if not valides:
         return {"inserted": 0, "skipped": skipped}
 
-    # ==================== 4. INSERTION PAR LOTS ====================
+    # ==================== INSERTION PAR LOTS ====================
     inserted = 0
     batch_size = 100
 
-    for i in range(0, len(deduped), batch_size):
-        batch = deduped[i:i + batch_size]
+    for i in range(0, len(valides), batch_size):
+        batch = valides[i:i + batch_size]
 
         try:
             response = (
@@ -128,10 +159,16 @@ def get_jobs(
     type_contrat: Optional[str] = None,
     teletravail: Optional[bool] = None,
 ) -> dict:
-    """Recherche paginee avec filtres."""
+    """
+    Recherche paginee avec filtres.
+
+    Returns:
+        {total: int, limit: int, offset: int, results: list}
+    """
 
     query = supabase.table(TABLE).select("*", count="exact")
 
+    # Recherche texte
     if q:
         query = query.or_(
             f"titre.ilike.%{q}%,"
@@ -139,6 +176,7 @@ def get_jobs(
             f"entreprise.ilike.%{q}%"
         )
 
+    # Filtres
     if pays:
         query = query.ilike("pays", f"%{pays}%")
 
@@ -154,6 +192,7 @@ def get_jobs(
     if teletravail is not None:
         query = query.eq("teletravail", teletravail)
 
+    # Pagination + tri (boost_score en premier, puis created_at)
     response = (
         query
         .order("boost_score", desc=True)
@@ -263,3 +302,85 @@ def get_sources() -> list[str]:
     except Exception as e:
         logger.error(f"Erreur sources : {e}")
         return []
+`;
+
+// ==================== Fichiers ====================
+
+const FILES = {
+  "backend/app/services/job_service.py": JOB_SERVICE,
+};
+
+// ==================== Main ====================
+
+async function main() {
+  log.banner("MODULE 17b — INTEGRATION FILTRE");
+
+  if (!OPTIONS.uninstall && !validateRequirements(REQUIREMENTS, MODULE_NAME)) {
+    process.exit(1);
+  }
+
+  if (!OPTIONS.uninstall && isInstalled(MODULE_ID) && !OPTIONS.force) {
+    log.warn("Module deja installe.");
+    log.info("Utilisez --force pour reinstaller.");
+    process.exit(0);
+  }
+
+  if (OPTIONS.uninstall) {
+    log.info("Ce module ne fait que modifier job_service.py.");
+    if (!OPTIONS.dryRun) markUninstalled(MODULE_ID);
+    return;
+  }
+
+  log.section("Modification de job_service.py");
+
+  const results = writeFiles(FILES, {
+    overwrite: true,
+    dryRun: OPTIONS.dryRun,
+    backup: true,
+  });
+
+  for (const d of results.details) {
+    log.file(d.path, d.status);
+  }
+
+  log.info(
+    "-> " + results.created + " cree(s), " + results.overwritten + " ecrase(s)"
+  );
+
+  if (!OPTIONS.dryRun) {
+    markInstalled(MODULE_ID, {
+      version: MODULE_VERSION,
+      files: Object.keys(FILES),
+      filesOverwritten: results.overwritten,
+      note: "Filtre de pertinence integre dans bulk_create_jobs",
+    });
+  }
+
+  log.banner("MODULE 17b — TERMINE");
+
+  console.log("");
+  console.log("  Modifications :");
+  console.log("  - job_service.py (filtre integre)");
+  console.log("");
+  console.log("  Fonctionnalites :");
+  console.log("  - Exclut les articles de blog avant insertion");
+  console.log("  - Log les statistiques (gardees/rejetees)");
+  console.log("  - Conserve le tri par boost_score");
+  console.log("");
+  console.log("  Prochaines etapes :");
+  console.log("  1. Verifier la syntaxe :");
+  console.log("     cd backend");
+  console.log("     python -c \"from app.services.job_service import bulk_create_jobs; print('OK')\"");
+  console.log("");
+  console.log("  2. Lancer une collecte :");
+  console.log("     python -m scripts.run_collect");
+  console.log("");
+  console.log("  3. Verifier les logs (Filtre pertinence)");
+  console.log("");
+}
+
+main().catch((e) => {
+  log.error(e.message);
+  if (OPTIONS.verbose) console.error(e.stack);
+  process.exit(1);
+});

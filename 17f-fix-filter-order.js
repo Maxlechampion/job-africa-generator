@@ -1,4 +1,46 @@
-"""
+#!/usr/bin/env node
+
+/**
+ * ═══════════════════════════════════════════════════════════════
+ *  MODULE 17f — FIX ORDRE (Normaliser AVANT filtrer)
+ * ═══════════════════════════════════════════════════════════════
+ *
+ * Corrige l'ordre dans bulk_create_jobs :
+ *   1. Normaliser (decoder HTML, nettoyer)
+ *   2. Filtrer (detecter blogs, actualites)
+ *   3. Inserer
+ *
+ * FICHIERS MODIFIÉS (1) :
+ *   backend/app/services/job_service.py
+ *
+ * ═══════════════════════════════════════════════════════════════
+ */
+
+import fs from "fs";
+import path from "path";
+
+import { exists, writeFiles, removeFile, ROOT } from "./_lib/fs-utils.js";
+import { log } from "./_lib/logger.js";
+import { markInstalled, markUninstalled, isInstalled } from "./_lib/registry.js";
+import { validateRequirements } from "./_lib/validator.js";
+
+const args = process.argv.slice(2);
+const OPTIONS = {
+  force: args.includes("--force"),
+  dryRun: args.includes("--dry-run"),
+  uninstall: args.includes("--uninstall"),
+  verbose: args.includes("--verbose"),
+};
+
+const MODULE_ID = "17f";
+const MODULE_NAME = "Fix ordre filtre";
+const MODULE_VERSION = "1.0.0";
+
+const REQUIREMENTS = [
+  "backend/app/services/job_service.py",
+];
+
+const JOB_SERVICE = `"""
 Service de gestion des offres d'emploi.
 
 CRUD + recherche + statistiques.
@@ -263,3 +305,81 @@ def get_sources() -> list[str]:
     except Exception as e:
         logger.error(f"Erreur sources : {e}")
         return []
+`;
+
+const FILES = {
+  "backend/app/services/job_service.py": JOB_SERVICE,
+};
+
+async function main() {
+  log.banner("MODULE 17f — FIX ORDRE (Normaliser AVANT filtrer)");
+
+  if (!OPTIONS.uninstall && !validateRequirements(REQUIREMENTS, MODULE_NAME)) {
+    process.exit(1);
+  }
+
+  if (!OPTIONS.uninstall && isInstalled(MODULE_ID) && !OPTIONS.force) {
+    log.warn("Module deja installe.");
+    process.exit(0);
+  }
+
+  if (OPTIONS.uninstall) {
+    log.info("Ce module ne fait que modifier job_service.py.");
+    if (!OPTIONS.dryRun) markUninstalled(MODULE_ID);
+    return;
+  }
+
+  log.section("Modification de job_service.py");
+
+  const results = writeFiles(FILES, {
+    overwrite: true,
+    dryRun: OPTIONS.dryRun,
+    backup: true,
+  });
+
+  for (const d of results.details) {
+    log.file(d.path, d.status);
+  }
+
+  log.info(
+    "-> " + results.created + " cree(s), " + results.overwritten + " ecrase(s)"
+  );
+
+  if (!OPTIONS.dryRun) {
+    markInstalled(MODULE_ID, {
+      version: MODULE_VERSION,
+      files: Object.keys(FILES),
+      filesOverwritten: results.overwritten,
+      note: "Ordre corrige : Normaliser AVANT filtrer",
+    });
+  }
+
+  log.banner("MODULE 17f — TERMINE");
+
+  console.log("");
+  console.log("  Correction :");
+  console.log("  - Normalisation AVANT le filtre de pertinence");
+  console.log("");
+  console.log("  Nouveau flux :");
+  console.log("  1. Normalisation (decoder HTML, nettoyer)");
+  console.log("  2. Filtre (detecter blogs, actualites)");
+  console.log("  3. Deduplication");
+  console.log("  4. Insertion");
+  console.log("");
+  console.log("  Prochaines etapes :");
+  console.log("  1. Verifier la syntaxe :");
+  console.log("     cd backend");
+  console.log("     python -c 'from app.services.job_service import bulk_create_jobs; print(\\'OK\\')'");
+  console.log("");
+  console.log("  2. Relancer une collecte :");
+  console.log("     python -m scripts.run_collect");
+  console.log("");
+  console.log("  3. Verifier qu'il n'y a plus d'actualites");
+  console.log("");
+}
+
+main().catch((e) => {
+  log.error(e.message);
+  if (OPTIONS.verbose) console.error(e.stack);
+  process.exit(1);
+});
