@@ -112,7 +112,7 @@ PAYS_AFRIQUE_OUEST = {
 def clean_text(value: Optional[str]) -> Optional[str]:
     """
     Nettoie un texte :
-    - Decode les entites HTML (&#xe9; → e, &amp; → &, &nbsp; → espace)
+    - Decode les entites HTML en boucle (&#xe9; et &amp;#xe9; -> e)
     - Supprime les balises HTML
     - Supprime les caracteres de controle
     - Normalise les espaces
@@ -121,12 +121,17 @@ def clean_text(value: Optional[str]) -> Optional[str]:
     if not value:
         return None
 
-    # ==================== DECODAGE HTML ====================
-    # Decode les entites HTML : &#xe9; → é, &amp; → &, &nbsp; → espace
-    try:
-        value = html.unescape(value)
-    except Exception:
-        pass
+    # ==================== DECODAGE HTML EN BOUCLE ====================
+    # Certains flux RSS encodent 2 fois : &amp;#xe9; -> &#xe9; -> e
+    previous = None
+    iterations = 0
+    while previous != value and iterations < 3:
+        previous = value
+        try:
+            value = html.unescape(value)
+        except Exception:
+            break
+        iterations += 1
 
     # ==================== SUPPRESSION BALISES ====================
     value = re.sub(r"<[^>]+>", " ", value)

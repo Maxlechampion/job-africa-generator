@@ -56,4 +56,33 @@ def match_jobs_for_alert(alert: dict) -> list[dict]:
 
     filters = {k: v for k, v in filters.items() if v is not None}
 
-    return get_jobs(**filters).get("results", [])
+    jobs = get_jobs(**filters).get("results", [])
+
+    # ==================== FILTRE PAR DATE ====================
+    # Ne garde que les offres publiees apres la derniere notification
+    derniere_notif = alert.get("derniere_notification")
+
+    if derniere_notif:
+        try:
+            from datetime import datetime
+            d = datetime.fromisoformat(derniere_notif.replace("Z", "+00:00"))
+
+            filtered = []
+            for job in jobs:
+                job_date = job.get("created_at") or job.get("date_publication")
+                if not job_date:
+                    filtered.append(job)
+                    continue
+
+                try:
+                    jd = datetime.fromisoformat(job_date.replace("Z", "+00:00"))
+                    if jd > d:
+                        filtered.append(job)
+                except Exception:
+                    filtered.append(job)
+
+            return filtered
+        except Exception:
+            pass
+
+    return jobs

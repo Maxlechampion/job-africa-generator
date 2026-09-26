@@ -32,6 +32,20 @@ AFRICAN_LOCATIONS = [
     "Conakry, Guinee",
 ]
 
+# Mapping ville -> country_indeed (requis par JobSpy)
+LOCATION_TO_COUNTRY_INDEED = {
+    "Cotonou, Benin": "benin",
+    "Lome, Togo": "togo",
+    "Abidjan, Cote d'Ivoire": "cote d'ivoire",
+    "Dakar, Senegal": "senegal",
+    "Accra, Ghana": "ghana",
+    "Lagos, Nigeria": "nigeria",
+    "Bamako, Mali": "mali",
+    "Ouagadougou, Burkina Faso": "burkina faso",
+    "Niamey, Niger": "niger",
+    "Conakry, Guinee": "guinea",
+}
+
 # Termes de recherche
 SEARCH_TERMS = [
     "developer",
@@ -87,7 +101,7 @@ class GoogleJobsCollector(BaseCollector):
                         location=location,
                         results_wanted=self.results_per_query,
                         hours_old=168,
-                        country_indeed="nigeria", 
+                        country_indeed=LOCATION_TO_COUNTRY_INDEED.get(location, "benin"), 
                     )
 
                     # Convertit le DataFrame en liste

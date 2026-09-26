@@ -13,9 +13,7 @@ Fonctionnalites :
 """
 
 import time
-from app.collectors.rss_collector import RSSCollector
 from apscheduler.schedulers.background import BackgroundScheduler
-from app.collectors.sources.africa_free import ALL_AFRICA_FREE_SOURCES
 from apscheduler.triggers.interval import IntervalTrigger
 
 from app.core.config import settings
