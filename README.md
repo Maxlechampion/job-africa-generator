@@ -17,45 +17,52 @@ Chaque module peut être installé, testé, modifié ou supprimé **indépendamm
 
 ---
 
-## 📋 Modules disponibles
+## 📋 Modules disponibles (00 → 19)
 
-| ID | Nom | Description |
-|---|---|---|
-| 00 | Architecture | Crée l'arborescence complète |
-| 01 | Backend Base | FastAPI + Supabase |
-| 02 | Collecteurs | RSS + Scraping HTML |
-| 03 | Scheduler | APScheduler |
-| 04 | Déduplication | Dédup + catégorisation |
-| 05 | IA Hugging Face | Résumé, skills, matching |
-| 06 | Base enrichie | 15+ tables |
-| 07 | Frontend Vue | Vue 3 + Vite |
-| 08 | Dashboard Admin | Chart.js + KPIs |
-| 09 | CI/CD | GitHub Actions + Render + Vercel |
-| 10 | PWA | Installable Android + iOS |
-| 11 | Auth Supabase | Login + rôles |
-| 12 | Multi-langue | FR / EN |
-| 13 | Partage social | WhatsApp, LinkedIn |
-| 14 | Monétisation | Mobile Money + cartes |
-| 15 | Push | Web Push API |
+| ID | Nom | Fichier | Description |
+|---|---|---|---|
+| 00 | Architecture | `00-architecture.js` | Arborescence complète |
+| 01 | Backend Base | `01-backend-base.js` | FastAPI + Supabase |
+| 02 | Collecteurs | `02-collectors.js` | RSS + Scraping |
+| 03 | Scheduler | `03-scheduler.js` | APScheduler |
+| 03.5 | ATS Collector | `04-ats-collector.js` | Greenhouse + Ashby |
+| 04 | Scraper HTML | `04-scraper-html.js` | HTML + Playwright + PDF |
+| 05 | API Collector | `05-api-collector.js` | ProGigFinder + Fuzu |
+| 06 | Déduplication | `06-deduplication.js` | Dedup + catégorisation |
+| 07 | Base enrichie | `07-database-enriched.js` | 15+ tables |
+| 08 | IA Hugging Face | `08-ai-huggingface.js` | Résumé, skills, langue |
+| 09 | Frontend Vue | `09-frontend-vue.js` | Vue 3 + Vite |
+| 09b | CI/CD | `09b-cicd-deployment.js` | GitHub Actions |
+| 10 | Dashboard Admin | `10-admin-dashboard.js` | Chart.js + KPIs |
+| 10b | PWA | `10b-pwa.js` | Installable Android + iOS |
+| 11 | Auth Supabase | `11-auth-supabase.js` | Login + rôles |
+| 12 | Multi-langue | `12-i18n.js` | FR / EN |
+| 13 | Partage social | `13-social-share.js` | WhatsApp, LinkedIn, QR |
+| 14 | Monétisation | `14-monetization.js` | Mobile Money + cartes |
+| 14b | Page Tarifs | `14b-pricing-page.js` | Page /pricing |
+| 15 | Push | `15-push-notifications.js` | Web Push API |
+| 15b | Boutons Booster | `15b-boost-buttons.js` | Bouton sur les offres |
+| 15c | Fix use_admin | `15c-fix-use-admin.js` | Bypass RLS backend |
+| 15d | Payment Toast | `15d-payment-toast.js` | Notification paiement |
+| 16 | KKiaPay | `16-kkiapay.js` | Mobile Money réel |
+| 16b | Fix KKiaPay | `16b-fix-kkiapay.js` | Fix widget + fallback |
+| 16c | Fallback KKiaPay | `16c-kkiapay-fallback.js` | Widget → manual |
+| 16d | Fallback v2 | `16d-kkiapay-fallback-v2.js` | Détection DOM |
+| 17 | Filtre pertinence | `17-relevance-filter.js` | Exclusion blogs |
+| 17b→17f | Fix filtre | `17b-*.js` → `17f-*.js` | Itérations v1 → v3 |
+| 18 | Nettoyage DB | `18-clean-database.js` | Purge base |
+| 18b | Purge DB | `18b-purge-database.js` | Critères avancés |
+| 19 | Sources gratuites | `19-free-sources.js` | Google Jobs + Afrique |
 
 ---
 
 ## 🚀 Installation
 
 ```bash
-# 1. Installer les dépendances du générateur
 npm install
-
-# 2. Créer l'architecture (obligatoire)
 node 00-architecture.js
-
-# 3. Installer les modules dans l'ordre
 node 01-backend-base.js
-node 02-collectors.js
-node 03-scheduler.js
 # ...
-
-# OU tout installer d'un coup
 node run.js --all
 ```
 
@@ -73,26 +80,17 @@ node run.js --list
 # Installer un module spécifique
 node 01-backend-base.js
 
-# Installer plusieurs modules
-node run.js --only 01,02,03
-
 # Installer tous les modules
 node run.js --all
 
-# Réinstaller un module (écrase)
+# Réinstaller (écrase)
 node 01-backend-base.js --force
-
-# Ignorer les fichiers existants
-node 01-backend-base.js --skip-existing
 
 # Simuler sans écrire
 node 01-backend-base.js --dry-run
 
-# Désinstaller un module
+# Désinstaller
 node 01-backend-base.js --uninstall
-
-# Ou via le runner
-node run.js --uninstall 01
 ```
 
 ---
@@ -103,26 +101,19 @@ node run.js --uninstall 01
 job-africa-generator/
 ├── 00-architecture.js
 ├── 01-backend-base.js
-├── 02-collectors.js
 ├── ...
-├── 15-push-notifications.js
+├── 19-free-sources.js
 │
-├── _lib/
-│   ├── fs-utils.js
-│   ├── logger.js
-│   ├── registry.js
-│   └── validator.js
+├── _lib/           Utilitaires (fs-utils, logger, registry, validator)
+├── _config/        Configuration projet
+├── _state/         État des modules installés
+├── _backups/       Backups horodatés (gitignored)
 │
-├── _config/
-│   └── project.json
+├── backend/        FastAPI + Supabase
+├── frontend/       Vue 3 + Vite
+├── supabase/       Migrations SQL
 │
-├── _state/
-│   └── installed.json       ← Généré automatiquement
-│
-├── _backups/                ← Backups horodatés
-│   └── 2026-09-16T12-30-45/
-│
-├── run.js
+├── run.js          Runner principal
 ├── package.json
 └── README.md
 ```
@@ -131,68 +122,17 @@ job-africa-generator/
 
 ## 🔄 Rollback
 
-Si un module casse quelque chose :
-
 ```bash
-# 1. Voir les backups
+# Voir les backups
 ls _backups/
 
-# 2. Restaurer une version antérieure
-cp _backups/2026-09-16T12-30-45/backend/app/main.py backend/app/main.py
+# Restaurer
+cp _backups/2026-09-26T12-30-45/backend/app/main.py backend/app/main.py
 
-# 3. Ou désinstaller puis réinstaller
+# Ou désinstaller/réinstaller
 node 01-backend-base.js --uninstall
 node 01-backend-base.js
 ```
-
----
-
-## 📊 État des modules
-
-Le fichier `_state/installed.json` contient :
-
-```json
-{
-  "modules": {
-    "00": {
-      "installedAt": "2026-09-16T10:00:00.000Z",
-      "version": "1.0.0",
-      "directories": 30,
-      "files": 5
-    },
-    "01": {
-      "installedAt": "2026-09-16T10:05:00.000Z",
-      "version": "1.0.0",
-      "files": ["backend/requirements.txt", "..."],
-      "stats": { "created": 12, "overwritten": 0, "skipped": 0 }
-    }
-  }
-}
-```
-
----
-
-## 🎯 Bonnes pratiques
-
-1. **Toujours installer 00 en premier** (architecture)
-2. **Respecter l'ordre** des modules (01 → 15)
-3. **Tester chaque module** avant de passer au suivant
-4. **Commiter après chaque module** installé
-5. **Utiliser `--dry-run`** avant les gros changements
-6. **Sauvegarder `_state/installed.json`** dans git
-
----
-
-## ➕ Créer un nouveau module
-
-1. Copier `01-backend-base.js` comme template
-2. Renommer en `XX-nouveau-module.js`
-3. Modifier :
-   - Les prérequis
-   - Les fichiers à créer
-   - Les messages
-4. Ajouter dans `run.js` (tableau `MODULES`)
-5. Tester avec `--dry-run`
 
 ---
 
@@ -202,10 +142,35 @@ Le fichier `_state/installed.json` contient :
 → Installer d'abord les modules requis (00, et parfois 01)
 
 **Fichiers déjà existants**
-→ Utiliser `--force` pour écraser ou `--skip-existing` pour ignorer
+→ `--force` pour écraser, `--skip-existing` pour ignorer
 
 **Rollback nécessaire**
-→ Consulter `_backups/` (horodaté automatiquement)
+→ Consulter `_backups/`
 
 **État corrompu**
 → Supprimer `_state/installed.json` puis réinstaller
+
+---
+
+## 📚 Documentation
+
+- `MODULES.md` — Documentation détaillée des modules
+- `SECURITY_NOTES.md` — Notes de sécurité
+- `CI_CD_GUIDE.md` — Guide CI/CD
+- `backend/README.md` — Backend FastAPI
+- `frontend/README.md` — Frontend Vue 3
+- `supabase/README.md` — Base de données
+
+---
+
+## 📅 Historique
+
+| Date | Action |
+|---|---|
+| 17/09 | Modules 00 → 04 (architecture, backend, collecteurs) |
+| 18/09 | Modules 05 → 08 (API, dedup, base enrichie, IA) |
+| 22/09 | Modules 09 → 12 (frontend, dashboard, auth, i18n) |
+| 23/09 | CI/CD + PWA + partage + monétisation + push |
+| 24/09 | KKiaPay + toast + boost buttons + fix RLS |
+| 25/09 | Filtre v3 + purge DB + sources gratuites |
+| 26/09 | Sécurité CORS + fix bugs + nettoyage |
