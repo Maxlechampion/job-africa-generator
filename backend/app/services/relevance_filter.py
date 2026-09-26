@@ -19,6 +19,63 @@ Regles appliquees :
 """
 
 import re
+
+
+# ==================== SOURCES FIABLES (bypass filtre) ====================
+# Ces sources sont vérifiées manuellement : leurs offres sont TOUJOURS
+# considérées comme pertinentes, sans passer par le scoring.
+SOURCES_FIABLES = [
+    # Job boards tech
+    "Benin Digital",
+    "ProGigFinder",
+    "Jobzilla",
+    "MyJobMag",
+    "Flutterwave",
+    "Kuda",
+    "Paystack",
+
+    # ATS (Greenhouse / Ashby)
+    "Moniepoint (Greenhouse)",
+    "Andela (Ashby)",
+    "M-KOPA (Ashby)",
+    "LemFi (Ashby)",
+    "Sabi (Ashby)",
+    "Carbon (Greenhouse)",
+    "Jumia (Greenhouse)",
+
+    # Remote international
+    "WeWorkRemotely",
+    "Himalayas",
+    "NoDesk",
+    "Hacker News Jobs",
+    "Python.org Jobs",
+
+    # ONG / International
+    "ReliefWeb",
+    "UNJobs",
+
+    # Afrique locale
+    "Projobivoire",
+    "La Tempête Bénin",
+    "La Tempête Bénin".replace("Bénin", "BÃ©nin"),  # variante cassée
+    "La TempÃªte BÃ©nin",
+    "Emploi Togo",
+]
+
+
+def is_source_fiable(source: str | None) -> bool:
+    """Vérifie si une source est dans la whitelist."""
+    if not source:
+        return False
+
+    source_lower = source.lower()
+
+    for sf in SOURCES_FIABLES:
+        if sf.lower() in source_lower:
+            return True
+
+    return False
+
 from typing import Optional
 
 
@@ -306,6 +363,15 @@ def compute_relevance_score(
 
 def is_relevant_job(job: dict) -> tuple[bool, dict]:
     """Verifie si une offre est pertinente."""
+
+    # ✅ Court-circuit : sources fiables → toujours pertinentes
+    source = job.get("source")
+    if is_source_fiable(source):
+        return True, {
+            "score": 100,
+            "is_job_offer": True,
+            "details": {"whitelisted": True, "source": source},
+        }
 
     result = compute_relevance_score(
         titre=job.get("titre", ""),

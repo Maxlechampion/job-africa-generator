@@ -32,6 +32,7 @@ from app.api import (
     premium,
     sponsored,
     webhooks,
+    admin_sources_test,
 )
 from app.core.config import settings
 from app.core.logger import get_logger
@@ -114,6 +115,7 @@ app.include_router(skills.router)
 app.include_router(favorites.router)
 app.include_router(alerts.router)
 app.include_router(admin_sources.router)
+app.include_router(admin_sources_test.router)
 app.include_router(ai.router)
 app.include_router(dashboard.router)
 app.include_router(auth.router)

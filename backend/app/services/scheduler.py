@@ -20,8 +20,16 @@ from app.core.config import settings
 from app.core.logger import get_logger
 from app.collectors.sources.relay_rss import ALL_SOURCES
 from app.collectors.google_jobs import GoogleJobsCollector
+from app.collectors.scrapers.sources.jobberman import JobbermanScraper
+from app.collectors.scrapers.sources.emploirapide import EmploiRapideScraper
+from app.collectors.sources.fuzu import FuzuCollector
+from app.collectors.scrapers.sources.benin_digital import BeninDigitalScraper
+from app.collectors.sources.benin_rss.la_tempete import LaTempeteBeninRSS
 from app.services.job_service import bulk_create_jobs
 from app.services.log_service import log_collect
+from app.collectors.ats.greenhouse_sources import ALL_GREENHOUSE_SOURCES
+from app.collectors.ats.ashby_sources import ALL_ASHBY_SOURCES
+from app.collectors.ats.lever import LeverCollector
 
 
 logger = get_logger(__name__)
@@ -287,6 +295,200 @@ def run_all_collectors() -> dict:
     }
 
 
+
+
+# ==================== SOURCES BÉNIN ====================
+BENIN_SOURCES = [
+    BeninDigitalScraper,   # 45 offres tech (scraper HTML)
+    LaTempeteBeninRSS,     # PSIE (RSS)
+]
+
+
+def run_benin_collectors() -> dict:
+    """Lance les sources Bénin (Benin Digital + La Tempête)."""
+
+    logger.info("-" * 60)
+    logger.info("Collecte sources Benin...")
+    logger.info("-" * 60)
+
+    total_collected = 0
+    total_inserted = 0
+    total_skipped = 0
+    total_errors = 0
+
+    details = []
+
+    for SourceClass in BENIN_SOURCES:
+        source = SourceClass()
+        name = source.name
+
+        source_start = time.time()
+
+        try:
+            jobs = source.collect()
+            collected = len(jobs)
+
+            if collected == 0:
+                details.append({
+                    "source": name,
+                    "status": "empty",
+                    "collected": 0,
+                })
+                logger.info(f"  [SKIP] {name} : aucune offre")
+                continue
+
+            result = bulk_create_jobs(jobs)
+            inserted = result.get("inserted", 0)
+            skipped = result.get("skipped", 0)
+
+            total_collected += collected
+            total_inserted += inserted
+            total_skipped += skipped
+
+            duree = time.time() - source_start
+
+            details.append({
+                "source": name,
+                "status": "success",
+                "collected": collected,
+                "inserted": inserted,
+                "skipped": skipped,
+                "duration": round(duree, 2),
+            })
+
+            logger.info(
+                f"  [OK] {name} : {collected} collectees, "
+                f"{inserted} inserees, {skipped} ignorees ({duree:.1f}s)"
+            )
+
+        except Exception as e:
+            total_errors += 1
+            error_msg = str(e)[:200]
+
+            details.append({
+                "source": name,
+                "status": "error",
+                "error": error_msg,
+            })
+            logger.error(f"  [ERR] {name} : {error_msg}")
+
+    logger.info(
+        f"Benin termine : {total_collected} collectees, "
+        f"{total_inserted} inserees, {total_errors} erreurs"
+    )
+
+    return {
+        "total_collected": total_collected,
+        "total_inserted": total_inserted,
+        "total_skipped": total_skipped,
+        "total_errors": total_errors,
+        "details": details,
+    }
+
+
+# ==================== WRAPPER GLOBAL ====================
+_original_run_all = run_all_collectors
+
+
+def run_all_collectors_with_benin() -> dict:
+    """Wrapper : collecte globale + sources Benin."""
+
+    # 1. Collecte globale (RSS + Google Jobs)
+    result = _original_run_all()
+
+    # 2. Collecte Benin
+    benin = run_benin_collectors()
+
+    # 3. Fusion des resultats
+    result["total_collected"] += benin["total_collected"]
+    result["total_inserted"] += benin["total_inserted"]
+    result["total_skipped"] += benin["total_skipped"]
+    result["total_errors"] += benin["total_errors"]
+    result["details"].extend(benin["details"])
+
+    return result
+
+
+
+
+# ==================== SOURCES AFRIQUE (Jobberman + Fuzu + EmploiRapide) ====================
+AFRICA_SOURCES = [
+    JobbermanScraper,       # Nigeria / Ghana
+    FuzuCollector,          # Kenya / Nigeria / Uganda
+    EmploiRapideScraper,    # Cote d'Ivoire
+]
+
+
+def run_africa_collectors() -> dict:
+    """Lance les sources africaines majeures."""
+
+    logger.info("-" * 60)
+    logger.info("Collecte sources Afrique...")
+    logger.info("-" * 60)
+
+    total_collected = 0
+    total_inserted = 0
+    total_errors = 0
+    details = []
+
+    for SourceClass in AFRICA_SOURCES:
+        source = SourceClass()
+        name = source.name
+        source_start = time.time()
+
+        try:
+            jobs = source.collect()
+            collected = len(jobs)
+
+            if collected == 0:
+                details.append({
+                    "source": name,
+                    "status": "empty",
+                    "collected": 0,
+                })
+                logger.info(f"  [SKIP] {name} : aucune offre")
+                continue
+
+            result = bulk_create_jobs(jobs)
+            inserted = result.get("inserted", 0)
+            skipped = result.get("skipped", 0)
+
+            total_collected += collected
+            total_inserted += inserted
+
+            duree = time.time() - source_start
+
+            details.append({
+                "source": name,
+                "status": "success",
+                "collected": collected,
+                "inserted": inserted,
+                "skipped": skipped,
+                "duration": round(duree, 2),
+            })
+
+            logger.info(
+                f"  [OK] {name} : {collected} collectees, "
+                f"{inserted} inserees, {skipped} ignorees ({duree:.1f}s)"
+            )
+
+        except Exception as e:
+            total_errors += 1
+            error_msg = str(e)[:200]
+            details.append({
+                "source": name,
+                "status": "error",
+                "error": error_msg,
+            })
+            logger.error(f"  [ERR] {name} : {error_msg}")
+
+    return {
+        "total_collected": total_collected,
+        "total_inserted": total_inserted,
+        "total_errors": total_errors,
+        "details": details,
+    }
+
 # ==================== Nettoyage ====================
 def cleanup_expired():
     """
@@ -322,7 +524,7 @@ def start_scheduler():
 
     # ==================== Job 1 : Collecte ====================
     scheduler.add_job(
-        run_all_collectors,
+        run_all_collectors_with_benin,
         trigger=IntervalTrigger(hours=interval_hours),
         id="collect_jobs",
         name=f"Collecte automatique ({interval_hours}h)",

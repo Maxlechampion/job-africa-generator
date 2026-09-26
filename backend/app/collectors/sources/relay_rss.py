@@ -332,16 +332,16 @@ ALL_SOURCES = ALL_AFRICA_FREE_SOURCES + [
     # â”€â”€â”€ ONG / ONU / DÃ©veloppement â”€â”€â”€
     ReliefWebAfricaRSS,
     ReliefWebAllJobsRSS,
-    UNJobsRSS,
-    CoordinationSudRSS,
+    # UNJobsRSS,  # Désactivé (URL morte)
+    # CoordinationSudRSS,  # Désactivé (URL morte)
     # â”€â”€â”€ Afrique de l'Ouest (nouvelles sources vÃ©rifiÃ©es) â”€â”€â”€
-    AllAfricaBurkinaRSS,
-    AllAfricaCoteIvoireRSS,
-    AllAfricaWestAfricaRSS,
-    RmoSenegalRSS,
-    RmoCoteIvoireRSS,
-    HotNigerianJobsRSS,
-    ConcoursnRSS,
+    # AllAfricaBurkinaRSS,  # Désactivé (presse)
+    # AllAfricaCoteIvoireRSS,  # Désactivé (presse)
+    # AllAfricaWestAfricaRSS,  # Désactivé (presse)
+    # RmoSenegalRSS,  # Désactivé (URL morte)
+    # RmoCoteIvoireRSS,  # Désactivé (URL morte)
+    # HotNigerianJobsRSS,  # Désactivé (URL morte)
+    # ConcoursnRSS,  # Désactivé (URL 404)
     # â”€â”€â”€ Afrique francophone â”€â”€â”€
     ProjobivoireRSS,
     LaTempeteRSS,
