@@ -54,8 +54,14 @@ yarn-error.log*
 .env
 .env.local
 .env.*.local
+.env.production
+.env.development
+.env.test
+
+# Exceptions : on garde les exemples
 !.env.example
 !.env.production.example
+!.env.development.example
 
 # ==================== IDE ====================
 .vscode/*
@@ -78,6 +84,8 @@ Thumbs.db
 _backups/
 _state/*.json
 !_state/.gitkeep
+fichierjs/
+scripts.purge_database
 
 # ==================== IA (Hugging Face) ====================
 backend/.hf_cache/
@@ -96,6 +104,20 @@ lerna-debug.log*
 *.key
 secrets/
 
-# Dossier de stockage local des scripts JS
-fichierjs/
-scripts.purge_database
+# ==================== Rapports d'audit (contiennent des secrets) ====================
+projet-complet.txt
+rapport-projet-*.md
+extract-*.js
+extract-*.cjs
+verify-clean.cjs
+
+# ==================== Caches ====================
+.ruff_cache/
+.pytest_cache/
+
+# ==================== Fichiers temporaires ====================
+test-all.js
+*.bak
+backend/.env
+frontend/.env
+frontend/.env.production
