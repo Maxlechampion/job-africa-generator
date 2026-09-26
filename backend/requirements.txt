@@ -38,4 +38,4 @@ pywebpush==2.0.0
 # sentence-transformers==3.2.1
 # torch==2.5.1
 # accelerate==1.1.1
-# gliner==0.2.13
+# gliner==0.2.13\n# ==================== JOB SPY (Google Jobs) ====================\npython-jobspy==1.1.75\n

@@ -1,21 +1,22 @@
-"""
+﻿"""
 Sources RSS d'offres d'emploi pour Job Africa.
 
-⚠️ MAINTENANCE — Sources vérifiées le 2026-09-17
+âš ï¸ MAINTENANCE â€” Sources vÃ©rifiÃ©es le 2026-09-17
 ==================================================
 Ajout de sources Afrique de l'Ouest (AllAfrica, HotNigerianJobs, etc.).
 
 Statut :
-    ✅ Validée     → testée, fonctionne
-    🟡 Probable    → existe, à tester
-    🔧 À venir     → nécessite un scraper (module futur)
+    âœ… ValidÃ©e     â†’ testÃ©e, fonctionne
+    ðŸŸ¡ Probable    â†’ existe, Ã  tester
+    ðŸ”§ Ã€ venir     â†’ nÃ©cessite un scraper (module futur)
 """
 
 from app.collectors.rss_collector import RSSCollector
+from app.collectors.sources.africa_free import ALL_AFRICA_FREE_SOURCES
 
-# ═══════════════════════════════════════════════════════════════
-# 1. SOURCES INTERNATIONALES REMOTE (✅ Validées)
-# ═══════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# 1. SOURCES INTERNATIONALES REMOTE (âœ… ValidÃ©es)
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class WeWorkRemotelyAllRSS(RSSCollector):
@@ -130,9 +131,9 @@ class PythonOrgJobsRSS(RSSCollector):
         )
 
 
-# ═══════════════════════════════════════════════════════════════
-# 2. SOURCES ONG / ONU / DÉVELOPPEMENT (🟡 Probables)
-# ═══════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# 2. SOURCES ONG / ONU / DÃ‰VELOPPEMENT (ðŸŸ¡ Probables)
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class ReliefWebAfricaRSS(RSSCollector):
@@ -167,16 +168,16 @@ class CoordinationSudRSS(RSSCollector):
         )
 
 
-# ═══════════════════════════════════════════════════════════════
-# 3. SOURCES AFRIQUE DE L'OUEST (🟡 Probables)
-# ═══════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# 3. SOURCES AFRIQUE DE L'OUEST (ðŸŸ¡ Probables)
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class AllAfricaBurkinaRSS(RSSCollector):
     """
-    AllAfrica — Actualités Burkina Faso.
+    AllAfrica â€” ActualitÃ©s Burkina Faso.
 
-    🟡 Probable — flux RDF officiel AllAfrica [citation:3][citation:9].
+    ðŸŸ¡ Probable â€” flux RDF officiel AllAfrica [citation:3][citation:9].
     """
 
     def __init__(self):
@@ -189,24 +190,24 @@ class AllAfricaBurkinaRSS(RSSCollector):
 
 class AllAfricaCoteIvoireRSS(RSSCollector):
     """
-    AllAfrica — Actualités Côte d'Ivoire.
+    AllAfrica â€” ActualitÃ©s CÃ´te d'Ivoire.
 
-    🟡 Probable — flux RDF officiel AllAfrica [citation:6].
+    ðŸŸ¡ Probable â€” flux RDF officiel AllAfrica [citation:6].
     """
 
     def __init__(self):
         super().__init__(
             feed_url="https://fr.allafrica.com/tools/headlines/rdf/cotedivoire/headlines.rdf",
-            source_name="AllAfrica Côte d'Ivoire",
-            country="Côte d'Ivoire",
+            source_name="AllAfrica CÃ´te d'Ivoire",
+            country="CÃ´te d'Ivoire",
         )
 
 
 class AllAfricaWestAfricaRSS(RSSCollector):
     """
-    AllAfrica — Actualités Afrique de l'Ouest (tous pays).
+    AllAfrica â€” ActualitÃ©s Afrique de l'Ouest (tous pays).
 
-    🟡 Probable — flux RDF officiel AllAfrica [citation:9].
+    ðŸŸ¡ Probable â€” flux RDF officiel AllAfrica [citation:9].
     """
 
     def __init__(self):
@@ -218,39 +219,39 @@ class AllAfricaWestAfricaRSS(RSSCollector):
 
 class RmoSenegalRSS(RSSCollector):
     """
-    RMO Job Center — Offres d'emploi Sénégal.
+    RMO Job Center â€” Offres d'emploi SÃ©nÃ©gal.
 
-    ✅ Validée — RMO indique explicitement proposer des flux RSS [citation:2].
+    âœ… ValidÃ©e â€” RMO indique explicitement proposer des flux RSS [citation:2].
     """
 
     def __init__(self):
         super().__init__(
             feed_url="https://www.rmo-jobcenter.com/fr/senegal/offres-emploi/rss",
-            source_name="RMO Sénégal",
-            country="Sénégal",
+            source_name="RMO SÃ©nÃ©gal",
+            country="SÃ©nÃ©gal",
         )
 
 
 class RmoCoteIvoireRSS(RSSCollector):
     """
-    RMO Job Center — Offres d'emploi Côte d'Ivoire.
+    RMO Job Center â€” Offres d'emploi CÃ´te d'Ivoire.
 
-    ✅ Validée — RMO indique explicitement proposer des flux RSS.
+    âœ… ValidÃ©e â€” RMO indique explicitement proposer des flux RSS.
     """
 
     def __init__(self):
         super().__init__(
             feed_url="https://www.rmo-jobcenter.com/fr/cote-ivoire/offres-emploi/rss",
-            source_name="RMO Côte d'Ivoire",
-            country="Côte d'Ivoire",
+            source_name="RMO CÃ´te d'Ivoire",
+            country="CÃ´te d'Ivoire",
         )
 
 
 class HotNigerianJobsRSS(RSSCollector):
     """
-    HotNigerianJobs — Offres Nigeria.
+    HotNigerianJobs â€” Offres Nigeria.
 
-    ✅ Validée — Flux RSS disponible via follow.it [citation:24].
+    âœ… ValidÃ©e â€” Flux RSS disponible via follow.it [citation:24].
     """
 
     def __init__(self):
@@ -263,22 +264,22 @@ class HotNigerianJobsRSS(RSSCollector):
 
 class ConcoursnRSS(RSSCollector):
     """
-    Concoursn.com — Recrutements Sénégal.
+    Concoursn.com â€” Recrutements SÃ©nÃ©gal.
 
-    ✅ Validée — Flux WordPress actif [citation:8].
+    âœ… ValidÃ©e â€” Flux WordPress actif [citation:8].
     """
 
     def __init__(self):
         super().__init__(
             feed_url="https://concoursn.com/tag/vendeur/feed/",
-            source_name="Concoursn Sénégal",
-            country="Sénégal",
+            source_name="Concoursn SÃ©nÃ©gal",
+            country="SÃ©nÃ©gal",
         )
 
 
-# ═══════════════════════════════════════════════════════════════
-# 4. SOURCES AFRICAINES FRANCOPHONES (✅ Validées)
-# ═══════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# 4. SOURCES AFRICAINES FRANCOPHONES (âœ… ValidÃ©es)
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 class ProjobivoireRSS(RSSCollector):
@@ -286,7 +287,7 @@ class ProjobivoireRSS(RSSCollector):
         super().__init__(
             feed_url="https://projobivoire.com/emploi-type/full-time/feed/",
             source_name="Projobivoire",
-            country="Côte d'Ivoire",
+            country="CÃ´te d'Ivoire",
         )
 
 
@@ -294,8 +295,8 @@ class LaTempeteRSS(RSSCollector):
     def __init__(self):
         super().__init__(
             feed_url="https://quotidienlatempete.bj/tag/actu-offre-demploi/feed/",
-            source_name="La Tempête Bénin",
-            country="Bénin",
+            source_name="La TempÃªte BÃ©nin",
+            country="BÃ©nin",
         )
 
 
@@ -308,12 +309,12 @@ class EmploiTogoRSS(RSSCollector):
         )
 
 
-# ═══════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # 5. REGISTRE DES SOURCES ACTIVES
-# ═══════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
-ALL_SOURCES = [
-    # ─── Remote international (fiables) ───
+ALL_SOURCES = ALL_AFRICA_FREE_SOURCES + [
+    # â”€â”€â”€ Remote international (fiables) â”€â”€â”€
     WeWorkRemotelyAllRSS,
     WeWorkRemotelyProgrammingRSS,
     WeWorkRemotelyFullStackRSS,
@@ -328,12 +329,12 @@ ALL_SOURCES = [
     NoDeskRSS,
     HackerNewsWhoIsHiringRSS,
     PythonOrgJobsRSS,
-    # ─── ONG / ONU / Développement ───
+    # â”€â”€â”€ ONG / ONU / DÃ©veloppement â”€â”€â”€
     ReliefWebAfricaRSS,
     ReliefWebAllJobsRSS,
     UNJobsRSS,
     CoordinationSudRSS,
-    # ─── Afrique de l'Ouest (nouvelles sources vérifiées) ───
+    # â”€â”€â”€ Afrique de l'Ouest (nouvelles sources vÃ©rifiÃ©es) â”€â”€â”€
     AllAfricaBurkinaRSS,
     AllAfricaCoteIvoireRSS,
     AllAfricaWestAfricaRSS,
@@ -341,43 +342,43 @@ ALL_SOURCES = [
     RmoCoteIvoireRSS,
     HotNigerianJobsRSS,
     ConcoursnRSS,
-    # ─── Afrique francophone ───
+    # â”€â”€â”€ Afrique francophone â”€â”€â”€
     ProjobivoireRSS,
     LaTempeteRSS,
     EmploiTogoRSS,
 ]
 
 
-# ═══════════════════════════════════════════════════════════════
-# 6. SOURCES À VENIR (nécessitent un scraper HTML — module 04)
-# ═══════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# 6. SOURCES Ã€ VENIR (nÃ©cessitent un scraper HTML â€” module 04)
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
-# 🔧 Bénin Web TV        : https://beninwebtv.bj/emploi-benin/
-# 🔧 Bénin Intelligent   : https://beninintelligent.com
-# 🔧 CFAO Careers        : https://www.cfao.com/careers
-# 🔧 Maliweb Emploi      : https://www.maliweb.net/category/emploi
-# 🔧 Zonemploi Niger     : https://www.zonemploi.com
-# 🔧 MyJobMag Nigeria    : https://www.myjobmag.com
-# 🔧 Jobzilla Nigeria    : https://www.jobzilla.ng
-# 🔧 Gamjobs Gambie      : https://gamjobs.com
-# 🔧 JobsKazi Ghana      : https://jobskazi.com
-# 🔧 Devex               : https://www.devex.com/jobs
-# 🔧 ECOWAS / CEDEAO     : https://www.ecowas.int/careers/
-# 🔧 UEMOA               : https://www.uemoa.int/fr/appels-a-candidature
-# 🔧 Working Nomads      : https://www.workingnomads.com/jobs
-# 🔧 Remotive (API JSON) : https://remotive.com/api/remote-jobs
-# 🔧 Dice                : https://www.dice.com/jobs
-# 🔧 ProZ                : https://www.proz.com/translation-jobs/
-# 🔧 Upwork              : https://www.upwork.com/ab/jobs/
+# ðŸ”§ BÃ©nin Web TV        : https://beninwebtv.bj/emploi-benin/
+# ðŸ”§ BÃ©nin Intelligent   : https://beninintelligent.com
+# ðŸ”§ CFAO Careers        : https://www.cfao.com/careers
+# ðŸ”§ Maliweb Emploi      : https://www.maliweb.net/category/emploi
+# ðŸ”§ Zonemploi Niger     : https://www.zonemploi.com
+# ðŸ”§ MyJobMag Nigeria    : https://www.myjobmag.com
+# ðŸ”§ Jobzilla Nigeria    : https://www.jobzilla.ng
+# ðŸ”§ Gamjobs Gambie      : https://gamjobs.com
+# ðŸ”§ JobsKazi Ghana      : https://jobskazi.com
+# ðŸ”§ Devex               : https://www.devex.com/jobs
+# ðŸ”§ ECOWAS / CEDEAO     : https://www.ecowas.int/careers/
+# ðŸ”§ UEMOA               : https://www.uemoa.int/fr/appels-a-candidature
+# ðŸ”§ Working Nomads      : https://www.workingnomads.com/jobs
+# ðŸ”§ Remotive (API JSON) : https://remotive.com/api/remote-jobs
+# ðŸ”§ Dice                : https://www.dice.com/jobs
+# ðŸ”§ ProZ                : https://www.proz.com/translation-jobs/
+# ðŸ”§ Upwork              : https://www.upwork.com/ab/jobs/
 
 
-# ═══════════════════════════════════════════════════════════════
-# 7. RÉSUMÉ DES SOURCES
-# ═══════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# 7. RÃ‰SUMÃ‰ DES SOURCES
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 
 def get_sources_summary() -> list[dict]:
-    """Retourne un résumé de toutes les sources configurées."""
+    """Retourne un rÃ©sumÃ© de toutes les sources configurÃ©es."""
     summary = []
 
     for CollectorClass in ALL_SOURCES:

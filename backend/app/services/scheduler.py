@@ -1,30 +1,35 @@
 """
 Scheduler automatique de collecte.
 
-Utilise APScheduler pour lancer la collecte de toutes les
-sources a intervalle regulier.
+Utilise APScheduler (BackgroundScheduler) pour lancer
+la collecte de toutes les sources a intervalle regulier.
 
-Usage :
-    from app.services.scheduler import start_scheduler, stop_scheduler
-    start_scheduler()  # au startup de FastAPI
-    stop_scheduler()   # a l'arret
+Fonctionnalites :
+    - Collecte periodique (defaut : toutes les 6h)
+    - Orchestration de tous les collecteurs (RSS + ATS + Google Jobs)
+    - Journalisation en base (table collect_logs)
+    - Nettoyage automatique (offres premium expirees)
+    - Start/Stop propre
 """
 
 import time
-
+from app.collectors.rss_collector import RSSCollector
 from apscheduler.schedulers.background import BackgroundScheduler
+from app.collectors.sources.africa_free import ALL_AFRICA_FREE_SOURCES
 from apscheduler.triggers.interval import IntervalTrigger
 
-from app.collectors.sources.relay_rss import ALL_SOURCES
 from app.core.config import settings
 from app.core.logger import get_logger
+from app.collectors.sources.relay_rss import ALL_SOURCES
+from app.collectors.google_jobs import GoogleJobsCollector
 from app.services.job_service import bulk_create_jobs
 from app.services.log_service import log_collect
+
 
 logger = get_logger(__name__)
 
 
-# ==================== Scheduler ====================
+# ==================== Scheduler global ====================
 scheduler = BackgroundScheduler(
     timezone="UTC",
     job_defaults={
@@ -35,9 +40,10 @@ scheduler = BackgroundScheduler(
 )
 
 
+# ==================== Collecte RSS + ATS ====================
 def run_all_collectors() -> dict:
     """
-    Lance tous les collecteurs et insere les offres en base.
+    Lance tous les collecteurs (RSS + Google Jobs).
 
     Returns:
         Resume de la collecte
@@ -56,6 +62,7 @@ def run_all_collectors() -> dict:
 
     details = []
 
+    # ==================== 1. SOURCES RSS + ATS ====================
     for CollectorClass in ALL_SOURCES:
         collector = CollectorClass()
         source_name = collector.name
@@ -78,15 +85,13 @@ def run_all_collectors() -> dict:
                     duree_secondes=round(duree, 2),
                 )
 
-                details.append(
-                    {
-                        "source": source_name,
-                        "status": "empty",
-                        "collected": 0,
-                        "inserted": 0,
-                        "skipped": 0,
-                    }
-                )
+                details.append({
+                    "source": source_name,
+                    "status": "empty",
+                    "collected": 0,
+                    "inserted": 0,
+                    "skipped": 0,
+                })
 
                 logger.info(f"  [SKIP] {source_name} : aucune offre")
                 continue
@@ -111,16 +116,14 @@ def run_all_collectors() -> dict:
                 duree_secondes=round(duree, 2),
             )
 
-            details.append(
-                {
-                    "source": source_name,
-                    "status": "success",
-                    "collected": collected,
-                    "inserted": inserted,
-                    "skipped": skipped,
-                    "duration": round(duree, 2),
-                }
-            )
+            details.append({
+                "source": source_name,
+                "status": "success",
+                "collected": collected,
+                "inserted": inserted,
+                "skipped": skipped,
+                "duration": round(duree, 2),
+            })
 
             logger.info(
                 f"  [OK] {source_name} : "
@@ -146,17 +149,124 @@ def run_all_collectors() -> dict:
                 erreur=error_msg,
             )
 
-            details.append(
-                {
-                    "source": source_name,
-                    "status": "error",
-                    "error": error_msg,
-                    "duration": round(duree, 2),
-                }
-            )
+            details.append({
+                "source": source_name,
+                "status": "error",
+                "error": error_msg,
+                "duration": round(duree, 2),
+            })
 
             logger.error(f"  [ERR] {source_name} : {error_msg}")
 
+    # ==================== 2. GOOGLE JOBS ====================
+    logger.info("-" * 60)
+    logger.info("Collecte Google Jobs...")
+    logger.info("-" * 60)
+
+    google_start = time.time()
+
+    try:
+        google_collector = GoogleJobsCollector(
+            search_terms=[
+                "developer",
+                "marketing",
+                "accountant",
+            ],
+            locations=[
+                "Cotonou, Benin",
+                "Dakar, Senegal",
+                "Abidjan, Cote d'Ivoire",
+            ],
+            results_per_query=10,
+        )
+
+        google_jobs = google_collector.safe_collect()
+        collected = len(google_jobs)
+
+        if collected == 0:
+            duree = time.time() - google_start
+
+            log_collect(
+                source_nom="Google Jobs",
+                statut="success",
+                offres_collectees=0,
+                offres_inserees=0,
+                offres_ignorees=0,
+                duree_secondes=round(duree, 2),
+            )
+
+            details.append({
+                "source": "Google Jobs",
+                "status": "empty",
+                "collected": 0,
+            })
+
+            logger.info("  [SKIP] Google Jobs : aucune offre")
+
+        else:
+            result = bulk_create_jobs(google_jobs)
+
+            inserted = result.get("inserted", 0)
+            skipped = result.get("skipped", 0)
+
+            total_collected += collected
+            total_inserted += inserted
+            total_skipped += skipped
+
+            duree = time.time() - google_start
+
+            log_collect(
+                source_nom="Google Jobs",
+                statut="success",
+                offres_collectees=collected,
+                offres_inserees=inserted,
+                offres_ignorees=skipped,
+                duree_secondes=round(duree, 2),
+            )
+
+            details.append({
+                "source": "Google Jobs",
+                "status": "success",
+                "collected": collected,
+                "inserted": inserted,
+                "skipped": skipped,
+                "duration": round(duree, 2),
+            })
+
+            logger.info(
+                f"  [OK] Google Jobs : "
+                f"{collected} collectees, "
+                f"{inserted} inserees, "
+                f"{skipped} ignorees "
+                f"({duree:.1f}s)"
+            )
+
+    except Exception as e:
+        total_errors += 1
+
+        duree = time.time() - google_start
+        error_msg = str(e)[:500]
+
+        log_collect(
+            source_nom="Google Jobs",
+            statut="error",
+            offres_collectees=0,
+            offres_inserees=0,
+            offres_ignorees=0,
+            duree_secondes=round(duree, 2),
+            erreur=error_msg,
+        )
+
+        details.append({
+            "source": "Google Jobs",
+            "status": "error",
+            "error": error_msg,
+            "duration": round(duree, 2),
+        })
+
+        logger.error(f"  [ERR] Google Jobs : {error_msg}")
+
+    # ==================== RESUME ====================
     total_duree = time.time() - start_time
 
     logger.info("=" * 60)
@@ -179,19 +289,31 @@ def run_all_collectors() -> dict:
     }
 
 
+# ==================== Nettoyage ====================
 def cleanup_expired():
     """
     Tache de nettoyage : desactive les offres premium expirees.
-    Seront implementees dans le module 14 (monetisation).
     """
 
     logger.info("Nettoyage des offres expirees...")
+
+    # Placeholder - implemente dans le module 14 (monetisation)
+    # from app.services.premium_service import deactivate_expired_premium
+    # from app.services.sponsored_service import deactivate_expired_sponsored
+    # deactivate_expired_premium()
+    # deactivate_expired_sponsored()
+
     logger.info("Nettoyage termine")
 
 
+# ==================== Demarrage / Arret ====================
 def start_scheduler():
     """
-    Demarre le scheduler avec les jobs configures.
+    Demarre le scheduler.
+
+    Ajoute 2 jobs :
+        1. Collecte automatique (toutes les COLLECT_INTERVAL_HOURS heures)
+        2. Nettoyage (toutes les heures)
     """
 
     if scheduler.running:
@@ -200,7 +322,7 @@ def start_scheduler():
 
     interval_hours = settings.COLLECT_INTERVAL_HOURS
 
-    # Job 1 : collecte automatique
+    # ==================== Job 1 : Collecte ====================
     scheduler.add_job(
         run_all_collectors,
         trigger=IntervalTrigger(hours=interval_hours),
@@ -209,7 +331,7 @@ def start_scheduler():
         replace_existing=True,
     )
 
-    # Job 2 : nettoyage horaire
+    # ==================== Job 2 : Nettoyage ====================
     scheduler.add_job(
         cleanup_expired,
         trigger=IntervalTrigger(hours=1),
@@ -218,7 +340,7 @@ def start_scheduler():
         replace_existing=True,
     )
 
-    # Demarrage
+    # ==================== Demarrage ====================
     scheduler.start()
 
     logger.info("=" * 60)
@@ -248,14 +370,15 @@ def get_scheduler_status() -> dict:
 
     if scheduler.running:
         for job in scheduler.get_jobs():
-            jobs.append(
-                {
-                    "id": job.id,
-                    "name": job.name,
-                    "next_run": (job.next_run_time.isoformat() if job.next_run_time else None),
-                    "trigger": str(job.trigger),
-                }
-            )
+            jobs.append({
+                "id": job.id,
+                "name": job.name,
+                "next_run": (
+                    job.next_run_time.isoformat()
+                    if job.next_run_time else None
+                ),
+                "trigger": str(job.trigger),
+            })
 
     return {
         "running": scheduler.running,
